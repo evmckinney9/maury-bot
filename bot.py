@@ -11,6 +11,7 @@ import json
 import os
 import platform
 import random
+import numpy as np
 import sys
 
 import aiosqlite
@@ -20,10 +21,10 @@ from discord.ext.commands import Bot, Context
 
 import exceptions
 
-if not os.path.isfile("config.json"):
+if not os.path.isfile("../config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
 else:
-    with open("config.json") as file:
+    with open("../config.json") as file:
         config = json.load(file)
 
 """	
@@ -111,8 +112,22 @@ async def status_task() -> None:
     """
     Setup the game status task of the bot
     """
-    statuses = ["with you!", "with Krypton!", "with humans!"]
-    await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+    if np.random.random() < 0.05:
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="the sunset"))
+
+    statuses = [
+        "The lapping of the waves against the pier",
+        "The snapping of a flag in the breeze",
+        "The scuffle of feet from dock workers",
+        "The clang of a boat's bell",
+        "The rattle of the mooring chains",
+        "The chatter of fishermen",
+        "The low hum of boat engines",
+        "The distant rumble of thunder",
+        "The gentle clinking of fishing lines",
+        "The thrum of heavy cargo machinery",
+    ]
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=random.choice(statuses)))
 
 
 @bot.event
