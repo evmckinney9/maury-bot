@@ -26,6 +26,18 @@ from helpers import checks
 class Maury(commands.Cog, name="maury"):
     def __init__(self, bot):
         self.bot = bot
+        self.title_list = [
+            "*Gulp*",
+            "*Cough*",
+            "*Grunt*",
+            "*Hyeem*",
+            "*Heem*",
+            "*Ahem*",
+            "*Hmm*",
+            "*Hobble*",
+            "*Wheeze*",
+            "*Sigh*",
+        ]
 
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     
@@ -38,31 +50,31 @@ class Maury(commands.Cog, name="maury"):
         """
         :param context: The hybrid command context.
         """
-        embed = discord.Embed(
-            title="I got a movie for ya jackass,",
-            description="Beverely Hills Chihuahua 2 (ó﹏ò｡) ",
-            color=0xE02B2B
-        )
-        await context.send(embed=embed)
-
-        # # This will prevent your bot from stopping everything when doing a web request - see: https://discordpy.readthedocs.io/en/stable/faq.html#how-do-i-make-a-web-request
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.get("https://api.coindesk.com/v1/bpi/currentprice/BTC.json") as request:
-        #         if request.status == 200:
-        #             data = await request.json(
-        #                 content_type="application/javascript")  # For some reason the returned content is of type JavaScript
-        #             embed = discord.Embed(
-        #                 title="Bitcoin price",
-        #                 description=f"The current price is {data['bpi']['USD']['rate']} :dollar:",
-        #                 color=0x9C84EF
-        #             )
-        #         else:
-        #             embed = discord.Embed(
-        #                 title="Error!",
-        #                 description="There is something wrong with the API, please try again later",
-        #                 color=0xE02B2B
-        #             )
-        #         await context.send(embed=embed)
+        # embed = discord.Embed(
+        #     title="I got a movie for ya jackass,",
+        #     description="Beverely Hills Chihuahua 2 (ó﹏ò｡) ",
+        #     color=0xE02B2B
+        # )
+        # await context.send(embed=embed)
+        await context.defer()  # This will defer the response, so the user will see a loading state
+        # This will prevent your bot from stopping everything when doing a web request - see: https://discordpy.readthedocs.io/en/stable/faq.html#how-do-i-make-a-web-request
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://script.google.com/macros/s/AKfycbygn4fG-jiZqmIrqmiSDyzy8cOjeXDHUPAhA5OHVqLPW0WQLhn172dU3b-K5T2eg8pVPw/exec") as request:
+                if request.status == 200:
+                    data = await request.json()
+                    movie_str = data["movie"]
+                    embed = discord.Embed(
+                        title=np.random.choice(self.title_list),
+                        description=chatgpt3(f"Drunkedly recommend the movie {movie_str} as a desolate salty sea captain at a fisherman's wharf"),
+                        color=0x9C84EF
+                    )
+                else:
+                    embed = discord.Embed(
+                        title="Error!",
+                        description="There is something wrong with the API, please try again later",
+                        color=0xE02B2B
+                    )
+                await context.send(embed=embed)
 
     @commands.hybrid_command(
         name="chat",
@@ -74,20 +86,8 @@ class Maury(commands.Cog, name="maury"):
         """
         :param context: The hybrid command context.
         """
-        title_list  = [
-            "*Gulp*",
-            "*Cough*",
-            "*Grunt*",
-            "*Hyeem*",
-            "*Heem*",
-            "*Ahem*",
-            "*Hmm*",
-            "*Hobble*",
-            "*Wheeze*",
-            "*Sigh*",
-        ]
         embed = discord.Embed(
-            title=np.random.choice(title_list),
+            title=np.random.choice(self.title_list),
             description=chatgpt3("A quick silly concerning greeting from a desolate old sea faren captain at a wharf"),
             color=0x3256a8
         )
@@ -114,7 +114,7 @@ def chatgpt3(prompt):
         "max_tokens": 128,
         "temperature": 1,
         "top_p": 1,
-        "n": 2,
+        "n": 1,
         "stream": False,
         "logprobs": None,
     }
@@ -122,18 +122,23 @@ def chatgpt3(prompt):
     # generate a response
     print("Generating response...")
     # wait for a response
+    # async with openai.Completion.create(**kwargs) as response:
+    #     # ret the response
+    #     print(response)
+    #     print("Done!")
+    #     ret = response["choices"][0]["text"]
+
+    #     # clean text of newline chars
+    #     ret = ret.replace("\n", "")
+    #     ret = ret.replace("  ", " ")
+    #     await ret
     response = openai.Completion.create(**kwargs)
-        
     # ret the response
     print(response)
     print("Done!")
     ret = response["choices"][0]["text"]
 
-    # strip newlines
+    # clean text of newline chars
     ret = ret.replace("\n", "")
-    # remove if they exist, starting/ending qoutes
-    if ret[0] == '"':
-        ret = ret[1:]
-    if ret[-1] == '"':
-        ret = ret[:-1]
+    ret = ret.replace("  ", " ")
     return ret
