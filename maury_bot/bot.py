@@ -146,9 +146,7 @@ async def on_message(message: discord.Message) -> None:
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> None:
     """When a custom emoji is added to text, have a 10% chance of Maury responding according to the message being reacted to"""
-    emoji = reaction.emoji
     # break early if not in list of custom reaction list
-    
     if not reaction.is_custom_emoji():
         return
 
@@ -157,24 +155,32 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     if np.random.random() > react_probability:
         return
 
+    emoji = reaction.emoji
+    reactor = user.display_name
     message_text = reaction.message.content
-    author = reaction.message.author
+    author = reaction.message.author.display_name
+    response_text = ""
+
+    prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
+    prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf."
 
     # condemn, tread lightly
-    if any([kwarg in emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
-        pass
-
+    if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
+        prompt += "Condemn the sender for their message, on behalf of the reactor."
+    
     #say congratulations
-    elif any([kwarg in emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
-        pass
+    elif any([kwarg == emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
+        prompt += "Congratulate the sender for their message, on behalf of the reactor."
 
     # condolences
-    elif any([kwarg in emoji.name for kwarg in ["antisheeee", "low_energy"]]):
-        chat = None
-        pass
-
+    elif any([kwarg == emoji.name for kwarg in ["antisheeee", "low_energy"]]):
+        prompt += "Respond with condolences to the message from the sender, on behalf of the reactor."
+    
     else:
         return
+    
+    response_text = chatgpt3(prompt)
+    await reaction.message.channel.send(response_text)
 
 
 @bot.event
