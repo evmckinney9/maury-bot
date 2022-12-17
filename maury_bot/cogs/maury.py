@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 import numpy as np
 from helpers import checks
-from chatgpt3 import chatgpt3
+from maury_bot.chatgpt3 import chatgpt3
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
 Description:

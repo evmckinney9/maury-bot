@@ -5,7 +5,7 @@ import json
 
 def chatgpt3(prompt):
     # get api key from config.json
-    with open("../../config.json") as file:
+    with open("config.json") as file:
         data = json.load(file)
         openai.api_key = data["openai_api_key"]
 

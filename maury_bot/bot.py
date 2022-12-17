@@ -22,10 +22,10 @@ from maury_bot.chatgpt3 import chatgpt3
 
 import exceptions
 
-if not os.path.isfile("../config.json"):
+if not os.path.isfile("config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
 else:
-    with open("../../config.json") as file:
+    with open("config.json") as file:
         config = json.load(file)
 
 """	
@@ -77,8 +77,8 @@ bot = Bot(command_prefix=commands.when_mentioned_or(
 
 
 async def init_db():
-    async with aiosqlite.connect("database/database.db") as db:
-        with open("database/schema.sql") as file:
+    async with aiosqlite.connect("maury_bot/database/database.db") as db:
+        with open("maury_bot/database/schema.sql") as file:
             await db.executescript(file.read())
         await db.commit()
 
@@ -263,7 +263,7 @@ async def load_cogs() -> None:
     """
     The code in this function is executed whenever the bot will start.
     """
-    for file in os.listdir(f"./cogs"):
+    for file in os.listdir(f"maury_bot/cogs"):
         if file.endswith(".py"):
             extension = file[:-3]
             try:
