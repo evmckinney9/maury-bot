@@ -170,6 +170,13 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     if np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
+    # add message to cache to avoid double responding
+    last_messages.append(reaction.message.id)
+
+    # if cache is too large, remove oldest message
+    if len(last_messages) > 25:
+        last_messages.pop(0)
+
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
     prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf."
 
@@ -191,13 +198,6 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     response_text = chatgpt3(prompt)
     await reaction.message.channel.send(response_text)
     await reaction.message.add_reaction(reaction.emoji)
-
-    # add message to cache to avoid double responding
-    last_messages.append(reaction.message.id)
-
-    # if cache is too large, remove oldest message
-    if len(last_messages) > 25:
-        last_messages.pop(0)
 
 @bot.event
 async def on_command_completion(context: Context) -> None:
