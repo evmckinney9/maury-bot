@@ -19,26 +19,26 @@ from discord.ext.commands import Context
 
 from helpers import checks
 
+title_list = [
+        "*Gulp*",
+        "*Cough*",
+        "*Grunt*",
+        "*Hyeem*",
+        "*Heem*",
+        "*Ahem*",
+        "*Hmm*",
+        "*Hobble*",
+        "*Wheeze*",
+        "*Sigh*",
+]
 
 # Here we name the cog and create a new class for the cog.
 class Maury(commands.Cog, name="maury"):
     def __init__(self, bot):
         self.bot = bot
-        self.title_list = [
-            "*Gulp*",
-            "*Cough*",
-            "*Grunt*",
-            "*Hyeem*",
-            "*Heem*",
-            "*Ahem*",
-            "*Hmm*",
-            "*Hobble*",
-            "*Wheeze*",
-            "*Sigh*",
-        ]
+        self.title_list = title_list
 
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
-    
     @commands.hybrid_command(
         name="movie",
         description="Hey Maury, what movie should I watch?",
@@ -88,7 +88,7 @@ class Maury(commands.Cog, name="maury"):
         requester = f"@{context.author.display_name}"
         embed = discord.Embed(
             title=np.random.choice(self.title_list),
-            description=chatgpt3(f"A quick silly yet foreboding greeting to {requester} from a desolate old sea faren captain at a wharf"),
+            description=chatgpt3(f"Make a quick, silly yet foreboding greeting to {requester} as a desolate old sea faren captain at a wharf:\n"),
             color=0x3256a8
         )
         await context.send(embed=embed)
