@@ -18,13 +18,14 @@ import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
+from maury_bot.chatgpt3 import chatgpt3
 
 import exceptions
 
 if not os.path.isfile("../config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
 else:
-    with open("../config.json") as file:
+    with open("../../config.json") as file:
         config = json.load(file)
 
 """	
@@ -60,7 +61,8 @@ intents.message_content = True
 intents.presences = True
 """
 
-intents = discord.Intents.default()
+# intents = discord.Intents.default()
+intents = discord.Intents.all()
 
 """
 Uncomment this if you don't want to use prefix (normal) commands.
@@ -107,7 +109,7 @@ async def on_ready() -> None:
         await bot.tree.sync()
 
 
-@tasks.loop(minutes=1.0)
+@tasks.loop(minutes=60.0)
 async def status_task() -> None:
     """
     Setup the game status task of the bot
@@ -116,16 +118,16 @@ async def status_task() -> None:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="the sunset"))
 
     statuses = [
-        "The lapping of the waves against the pier",
-        "The snapping of a flag in the breeze",
-        "The scuffle of feet from dock workers",
-        "The clang of a boat's bell",
-        "The rattle of the mooring chains",
-        "The chatter of fishermen",
-        "The low hum of boat engines",
-        "The distant rumble of thunder",
-        "The gentle clinking of fishing lines",
-        "The thrum of heavy cargo machinery",
+        "the lapping of the waves against the pier",
+        "the snapping of a flag in the breeze",
+        "the scuffle of feet from dock workers",
+        "the clang of a boat's bell",
+        "the rattle of the mooring chains",
+        "the chatter of fishermen",
+        "the low hum of boat engines",
+        "the distant rumble of thunder",
+        "the gentle clinking of fishing lines",
+        "the thrum of heavy cargo machinery",
     ]
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=random.choice(statuses)))
 
@@ -140,6 +142,39 @@ async def on_message(message: discord.Message) -> None:
     if message.author == bot.user or message.author.bot:
         return
     await bot.process_commands(message)
+
+@bot.event
+async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> None:
+    """When a custom emoji is added to text, have a 10% chance of Maury responding according to the message being reacted to"""
+    emoji = reaction.emoji
+    # break early if not in list of custom reaction list
+    
+    if not reaction.is_custom_emoji():
+        return
+
+    # probability of reacting
+    react_probability = 1
+    if np.random.random() > react_probability:
+        return
+
+    message_text = reaction.message.content
+    author = reaction.message.author
+
+    # condemn, tread lightly
+    if any([kwarg in emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
+        pass
+
+    #say congratulations
+    elif any([kwarg in emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
+        pass
+
+    # condolences
+    elif any([kwarg in emoji.name for kwarg in ["antisheeee", "low_energy"]]):
+        chat = None
+        pass
+
+    else:
+        return
 
 
 @bot.event
