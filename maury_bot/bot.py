@@ -151,7 +151,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
 
     # probability of reacting
-    react_probability = 1
+    react_probability = .2
     if np.random.random() > react_probability:
         return
 

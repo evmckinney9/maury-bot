@@ -45,4 +45,10 @@ def chatgpt3(prompt):
     # clean text of newline chars
     ret = ret.replace("\n", "")
     ret = ret.replace("  ", " ")
+
+    #don't start or end with qoutes
+    if ret[0] == '"':
+        ret = ret[1:]
+    if ret[-1] == '"':
+        ret = ret[:-1]
     return ret
