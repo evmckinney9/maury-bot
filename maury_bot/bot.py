@@ -198,13 +198,13 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
     
     response_text = chatgpt3(prompt)
-    # await reaction.message.channel.send(response_text)
-    embed = discord.Embed(
-            title=np.random.choice(title_list),
-            description=response_text,
-            color=0x3256a8
-        )
-    await reaction.message.channel.send(embed)
+    await reaction.message.channel.send(response_text)
+    # embed = discord.Embed(
+    #         title=np.random.choice(title_list),
+    #         description=response_text,
+    #         color=0x3256a8
+    #     )
+    # await reaction.message.channel.send(embed=embed)
     await reaction.message.add_reaction(reaction.emoji)
 
 @bot.event

@@ -61,11 +61,13 @@ class Maury(commands.Cog, name="maury"):
                 if request.status == 200:
                     data = await request.json()
                     movie_str = data["movie"]
-                    embed = discord.Embed(
-                        title=np.random.choice(self.title_list),
-                        description=chatgpt3(f"Drunkedly recommend the movie {movie_str} as a desolate salty sea captain at a fisherman's wharf"),
-                        color=0x9C84EF
-                    )
+                    response_text = chatgpt3(f"Drunkedly recommend the movie {movie_str} as a desolate salty sea captain at a fisherman's wharf")
+                    # embed = discord.Embed(
+                    #     title=np.random.choice(self.title_list),
+                    #     description=response_text,
+                    #     color=0x9C84EF
+                    # )
+                    context.send(response_text)
                 else:
                     embed = discord.Embed(
                         title="Error!",
@@ -86,12 +88,14 @@ class Maury(commands.Cog, name="maury"):
         """
         # get requester
         requester = f"@{context.author.display_name}"
-        embed = discord.Embed(
-            title=np.random.choice(self.title_list),
-            description=chatgpt3(f"Make a quick, silly yet foreboding greeting to {requester} as a desolate old sea faren captain at a wharf:\n"),
-            color=0x3256a8
-        )
-        await context.send(embed=embed)
+        response_text = chatgpt3(f"Make a quick, silly yet foreboding greeting to {requester} as a desolate old sea faren captain at a wharf:\n")
+        # embed = discord.Embed(
+        #     title=np.random.choice(self.title_list),
+        #     description=response_text,
+        #     color=0x3256a8
+        # )
+        # await context.send(embed=embed)
+        await context.send(response_text)
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
