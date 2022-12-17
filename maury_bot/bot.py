@@ -74,7 +74,7 @@ If you want to use prefix commands, make sure to also enable the intent below in
 
 bot = Bot(command_prefix=commands.when_mentioned_or(
     config["prefix"]), intents=intents, help_command=None)
-
+last_messages = []
 
 async def init_db():
     async with aiosqlite.connect("maury_bot/database/database.db") as db:
@@ -146,20 +146,29 @@ async def on_message(message: discord.Message) -> None:
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> None:
     """When a custom emoji is added to text, have a 10% chance of Maury responding according to the message being reacted to"""
-    # break early if not in list of custom reaction list
-    if not reaction.is_custom_emoji():
-        return
-
-    # probability of reacting
-    react_probability = .2
-    if np.random.random() > react_probability:
-        return
-
     emoji = reaction.emoji
     reactor = user.display_name
     message_text = reaction.message.content
     author = reaction.message.author.display_name
     response_text = ""
+
+    # break early if not in list of custom reaction list
+    if not reaction.is_custom_emoji():
+        return
+    
+    # break of the reactor is a bot
+    # NOTE avoids loops of marking and responding to itself
+    if user.bot or reaction.message.author.bot:
+        return
+
+    # check where last response was to avoid double responding
+    if reaction.message.id in last_messages:
+        return
+    
+    # probability of reacting, banned has 1, otherwise .05
+    react_probability = .05
+    if np.random.random() > react_probability and reaction.emoji.name != "banned":
+        return
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
     prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf."
@@ -181,7 +190,14 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     
     response_text = chatgpt3(prompt)
     await reaction.message.channel.send(response_text)
+    await reaction.message.add_reaction(reaction.emoji)
 
+    # add message to cache to avoid double responding
+    last_messages.append(reaction.message.id)
+
+    # if cache is too large, remove oldest message
+    if len(last_messages) > 25:
+        last_messages.pop(0)
 
 @bot.event
 async def on_command_completion(context: Context) -> None:
