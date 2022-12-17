@@ -109,7 +109,7 @@ async def on_ready() -> None:
         await bot.tree.sync()
 
 
-@tasks.loop(minutes=60.0)
+@tasks.loop(hours=8)
 async def status_task() -> None:
     """
     Setup the game status task of the bot
@@ -178,7 +178,8 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         last_messages.pop(0)
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
-    prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf."
+    prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf.\n"
+    prompt += "Format for discord messaging.\n"
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):

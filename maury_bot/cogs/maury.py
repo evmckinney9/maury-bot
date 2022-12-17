@@ -84,9 +84,11 @@ class Maury(commands.Cog, name="maury"):
         """
         :param context: The hybrid command context.
         """
+        # get requester
+        requester = f"@{context.author.display_name}"
         embed = discord.Embed(
             title=np.random.choice(self.title_list),
-            description=chatgpt3("A quick silly concerning greeting from a desolate old sea faren captain at a wharf"),
+            description=chatgpt3(f"A quick silly yet foreboding greeting to {requester} from a desolate old sea faren captain at a wharf"),
             color=0x3256a8
         )
         await context.send(embed=embed)
