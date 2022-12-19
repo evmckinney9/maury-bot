@@ -87,6 +87,7 @@ class Maury(commands.Cog, name="maury"):
         :param context: The hybrid command context.
         """
         # get requester
+        await context.defer()
         requester = f"@{context.author.display_name}"
         response_text = chatgpt3(f"Make a quick, silly yet foreboding greeting to {requester} as a desolate old sea faren captain at a wharf:\n")
         # embed = discord.Embed(

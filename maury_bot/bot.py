@@ -180,24 +180,58 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
     prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf.\n"
-    prompt += "Format for discord messaging.\n"
+    # prompt += "Format for discord messaging.\n"
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
-        prompt += "Condemn the sender for their message, on behalf of the reactor."
+        prompt += "Respond with a condemnation of the message from the author, on behalf of you and the reactor."
     
     #say congratulations
     elif any([kwarg == emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
-        prompt += "Congratulate the sender for their message, on behalf of the reactor."
+        prompt += "Respond with congratulations to the message from the author, on behalf of you and the reactor."
 
     # condolences
     elif any([kwarg == emoji.name for kwarg in ["antisheeee", "low_energy"]]):
-        prompt += "Respond with condolences to the message from the sender, on behalf of the reactor."
+        prompt += "Respond with condolences to the message from the author, on behalf of you and the reactor."
     
+    #good answer
+    elif any([kwarg == emoji.name for kwarg in ["good_answer"]]):
+        prompt += "Let the author know you like what they said."
+    
+    # caught
+    elif any([kwarg == emoji.name for kwarg in ["caught", "cap"]]):
+        prompt += "Let the author know you  and the reactor have caught them in a lie."
+    
+    # drool
+    elif any([kwarg == emoji.name for kwarg in ["drool"]]):
+        prompt += "Let the author know you and the reactor are both drooling over their message."
+    
+    # sus
+    elif any([kwarg == emoji.name for kwarg in ["sus"]]):
+        prompt += "Let the author know you and the reactor think they are acting suspicious."
+    
+    # shock
+    elif any([kwarg == emoji.name for kwarg in ["shock"]]):
+        prompt += "Let the author know you and the reactor are shocked by their message."
+
+    # lul
+    elif any([kwarg == emoji.name for kwarg in ["lul"]]):
+        prompt += "Let the author know you and the reactor are laughing at their message."
+    
+    #joy
+    elif any([kwarg == emoji.name for kwarg in ["joy"]]):
+        prompt += "Let the author know you and the reactor are joyful about their message."
     else:
         return
     
+    # defer response
+    # await reaction.message.channel.defer() #can't defer in on_reaction_add i suppose
     response_text = chatgpt3(prompt)
+
+    # clean response_text, want to replace names with discord mentions
+    response_text = response_text.replace(reactor, user.mention)
+    response_text = response_text.replace(author, reaction.message.author.mention)
+
     await reaction.message.channel.send(response_text)
     # embed = discord.Embed(
     #         title=np.random.choice(title_list),
