@@ -76,6 +76,7 @@ If you want to use prefix commands, make sure to also enable the intent below in
 bot = Bot(command_prefix=commands.when_mentioned_or(
     config["prefix"]), intents=intents, help_command=None)
 last_messages = []
+high_activity = False
 
 async def init_db():
     async with aiosqlite.connect("maury_bot/database/database.db") as db:
@@ -132,6 +133,13 @@ async def status_task() -> None:
     ]
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=random.choice(statuses)))
 
+@tasks.loop(hours=0.5)
+async def maury_activity_level() -> None:
+    global high_activity #XXX bad code bc i dont know what class should be given this attribute
+    if high_activity:
+        # signing off
+        print("turning high activity mode off")
+    high_activity = False
 
 @bot.event
 async def on_message(message: discord.Message) -> None:
@@ -142,6 +150,13 @@ async def on_message(message: discord.Message) -> None:
     """
     if message.author == bot.user or message.author.bot:
         return
+    
+    #check if message contains meeka blep, then turn on high activity mode
+    #TODO could improve this using the discord.Emoji class
+    if "<:blep:847691502867316827>" in message.content:
+        global high_activity
+        high_activity = True
+        await message.add_reaction("<in_there:1038609216014921809>")
     await bot.process_commands(message)
 
 @bot.event
@@ -167,8 +182,10 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
     
     # probability of reacting, banned has 1, otherwise .05
-    react_probability = .05
-    if np.random.random() > react_probability and reaction.emoji.name != "banned":
+    react_probability = 0.05
+    global high_activity
+    print(high_activity)
+    if not high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
     # add message to cache to avoid double responding
@@ -180,7 +197,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
     prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf.\n"
-    # prompt += "Format for discord messaging.\n"
+    prompt += "Tag the author and reactor in the response when mentioning them.\n"
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
@@ -200,14 +217,14 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     
     # caught
     elif any([kwarg == emoji.name for kwarg in ["caught", "cap"]]):
-        prompt += "Let the author know you  and the reactor have caught them in a lie."
+        prompt += "Respond that you and the reactor have both caught the author in a lie."
     
     # drool
     elif any([kwarg == emoji.name for kwarg in ["drool"]]):
         prompt += "Let the author know you and the reactor are both drooling over their message."
     
     # sus
-    elif any([kwarg == emoji.name for kwarg in ["sus"]]):
+    elif any([kwarg == emoji.name for kwarg in ["sus", "terio"]]):
         prompt += "Let the author know you and the reactor think they are acting suspicious."
     
     # shock
@@ -225,12 +242,14 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
     
     # defer response
-    # await reaction.message.channel.defer() #can't defer in on_reaction_add i suppose
-    response_text = chatgpt3(prompt)
+    async with reaction.message.channel.typing():
+        response_text = chatgpt3(prompt)
 
-    # clean response_text, want to replace names with discord mentions
-    response_text = response_text.replace(reactor, user.mention)
-    response_text = response_text.replace(author, reaction.message.author.mention)
+        # clean response_text, want to replace names with discord mentions
+        # remove @
+        response_text = response_text.replace("@", "")
+        response_text = response_text.replace(reactor, user.mention)
+        response_text = response_text.replace(author, reaction.message.author.mention)
 
     await reaction.message.channel.send(response_text)
     # embed = discord.Embed(
