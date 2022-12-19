@@ -161,7 +161,7 @@ async def on_message(message: discord.Message) -> None:
 
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> None:
-    """When a custom emoji is added to text, have a 10% chance of Maury responding according to the message being reacted to"""
+    """When a custom emoji is added to text, have a variable probability chance of Maury responding according to the message being reacted to"""
     emoji = reaction.emoji
     reactor = user.display_name
     message_text = reaction.message.content
@@ -184,7 +184,6 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     # probability of reacting, banned has 1, otherwise .05
     react_probability = 0.05
     global high_activity
-    print(high_activity)
     if not high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
@@ -196,7 +195,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         last_messages.pop(0)
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
-    prompt += "Respond with the personality of a sea faren captain at a fisherman's wharf.\n"
+    prompt += "Respond with the personality of a quirky, jaded, seafaring captain named Maury Polse at a fisherman's wharf.\n"
     prompt += "Tag the author and reactor in the response when mentioning them.\n"
 
     # condemn, tread lightly
@@ -238,6 +237,11 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     #joy
     elif any([kwarg == emoji.name for kwarg in ["joy"]]):
         prompt += "Let the author know you and the reactor are joyful about their message."
+
+    #facepalm
+    elif any([kwarg == emoji.name for kwarg in ["facepalm"]]):
+        prompt += "Let the author know you and the reactor are facepalming at their message."
+
     else:
         return
     
