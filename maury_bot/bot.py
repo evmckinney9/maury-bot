@@ -221,7 +221,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     
     # send message
     async with reaction.message.channel.typing():
-        bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user)
+        await bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user)
     
     # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)
