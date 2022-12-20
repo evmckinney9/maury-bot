@@ -19,6 +19,7 @@ import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
 from maury_bot.chatgpt3 import bot_response
+from datetime import timedelta
 import exceptions
 
 if not os.path.isfile("config.json"):
@@ -138,6 +139,8 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     reactor = user.display_name
     message_text = reaction.message.content
     author = reaction.message.author.display_name
+    channel = reaction.message.channel
+    mentions = reaction.message.mentions
 
     # break early if not in list of custom reaction list
     if not reaction.is_custom_emoji():
@@ -164,6 +167,18 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     # if cache is too large, remove oldest message
     if len(last_messages) > 25:
         last_messages.pop(0)
+
+
+    # here, look at messages in the bot's cache
+    # we want to combine from older messages to give the bot more context
+    bot_messages = [m async for m in channel.history(limit=25, oldest_first=False, after=reaction.message.created_at + timedelta(-60))]
+    bot_messages = filter(lambda m: m.author == reaction.message.author, bot_messages) #filtering by author
+    bot_messages = sorted(bot_messages, key=lambda m: m.created_at) #ordering by time
+    message_text = " ".join([m.content for m in bot_messages]) #concatenating messages
+
+    #make sure to pass along all the user mentions
+    mentions.extend([mention for message in bot_messages for mention in message.mentions]) #XXX unreadable garbage
+    mentions = list(set(mentions)) # remove duplicates
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
 
@@ -217,10 +232,10 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     # if the author and reactor are the same person
     if author == reactor:
         prompt = prompt.replace("you and the reactor", "you")
+        prompt = prompt.replace("yourself and the reactor", "yourself")
     
     # send message
-    async with reaction.message.channel.typing():
-        await bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= reaction.message.mentions)
+    await bot_response(context = channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= mentions)
     
     # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)

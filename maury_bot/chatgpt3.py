@@ -5,6 +5,7 @@ import json
 from discord.ext.commands import Context
 from discord import User
 import random
+import re
 
 def response_cleaner(message: str) -> str:
     """Cleans the response from GPT-3"""
@@ -60,9 +61,9 @@ async def bot_response(context: Context, prompt: str, author: User=None, reactor
             prompt = prompt.replace("named Maury Polse ", "")
         
         if author is not None:
-            prompt += f"Remember that {author.display_name} asked you this question.\n"
+            prompt += f"Remember that {author.display_name} wrote this message.\n"
         if reactor is not None and reactor != author:
-            prompt += f"Remember that {reactor.display_name} reacted to this question.\n"
+            prompt += f"Remember that {reactor.display_name} reacted to the message.\n"
 
         # parsed for tagged user in the original message part of the prompt
         if mentions is not None:
@@ -77,9 +78,11 @@ async def bot_response(context: Context, prompt: str, author: User=None, reactor
         # remove @
         response_text = response_text.replace("@", "")
         if author is not None:
-            response_text = response_text.replace(author.display_name, author.mention)
+            # response_text = response_text.replace(author.display_name, author.mention)
+            # replace all instances, case insensitive
+            response_text = re.sub(author.display_name, author.mention, response_text, flags=re.IGNORECASE)
         if reactor is not None:
-            response_text = response_text.replace(reactor.display_name, reactor.mention)
+            # response_text = response_text.replace(reactor.display_name, reactor.mention)
+            response_text = re.sub(reactor.display_name, reactor.mention, response_text, flags=re.IGNORECASE)
         
-
         await context.send(response_text)
