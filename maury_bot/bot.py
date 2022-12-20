@@ -215,13 +215,12 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
 
     # if the author and reactor are the same person
-    print("eq case", author, reactor, author==reactor)
     if author == reactor:
         prompt = prompt.replace("you and the reactor", "you")
     
     # send message
     async with reaction.message.channel.typing():
-        await bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user)
+        await bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= reaction.message.mentions)
     
     # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)

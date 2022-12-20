@@ -49,7 +49,7 @@ def chatgpt3(prompt: str) -> str:
     ret = response_cleaner(ret)
     return ret
 
-async def bot_response(context: Context, prompt: str, author: User=None, reactor: User=None):
+async def bot_response(context: Context, prompt: str, author: User=None, reactor: User=None, mentions: list[User]=None):
     """Create and respond to the prompt with a message to the channel"""
     async with context.typing():
         #personality
@@ -63,6 +63,11 @@ async def bot_response(context: Context, prompt: str, author: User=None, reactor
             prompt += f"Remember that {author.display_name} asked you this question.\n"
         if reactor is not None and reactor != author:
             prompt += f"Remember that {reactor.display_name} reacted to this question.\n"
+
+        # parsed for tagged user in the original message part of the prompt
+        if mentions is not None:
+            for user in mentions:
+                prompt = prompt.replace(f"<@{user.id}>", user.display_name)
 
         print(prompt)
         response_text = chatgpt3(prompt)
