@@ -50,7 +50,7 @@ class Maury(commands.Cog, name="maury"):
                 if request.status == 200:
                     spreadsheet_data = await request.json()
                     movie_str = spreadsheet_data["movie"]
-                    await bot_response(f"Drunkedly recommend the movie {movie_str}")
+                    await bot_response(context=context, prompt=f"Drunkedly recommend the movie {movie_str}")
                 else:
                     embed = discord.Embed(
                         title="Error!",
@@ -73,7 +73,7 @@ class Maury(commands.Cog, name="maury"):
         # await context.defer()
         async with context.typing():
             author = f"{context.author.display_name}"
-            await bot_response(f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
+            await bot_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
