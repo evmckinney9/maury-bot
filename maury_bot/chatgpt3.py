@@ -57,17 +57,24 @@ async def bot_response(context: Context, prompt: str, author: User=None, reactor
 
         # small chance he knows his own name
         if random.random() > 0.1:
-            prompt.replace("named Maury Polse", "")
+            prompt = prompt.replace("named Maury Polse ", "")
         
-        prompt += "Tag the author and reactor in the response when mentioning them.\n"
+        if author is not None:
+            prompt += f"Remember that {author.display_name} asked you this question.\n"
+        if reactor is not None and reactor != author:
+            prompt += f"Remember that {reactor.display_name} reacted to this question.\n"
 
+        print(prompt)
         response_text = chatgpt3(prompt)
     
         #sub tags in response if author or reactors kwargs
         # clean response_text, want to replace names with discord mentions
         # remove @
         response_text = response_text.replace("@", "")
-        response_text = response_text.replace(reactor, reactor.mention)
-        response_text = response_text.replace(author, author.mention)
+        if author is not None:
+            response_text = response_text.replace(author.display_name, author.mention)
+        if reactor is not None:
+            response_text = response_text.replace(reactor.display_name, reactor.mention)
+        
 
         await context.send(response_text)

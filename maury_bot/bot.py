@@ -44,7 +44,6 @@ It is recommended to use slash commands and therefore not use prefix commands.
 If you want to use prefix commands, make sure to also enable the intent below in the Discord developer portal.
 """
 # intents.message_content = True
-
 bot = Bot(command_prefix=commands.when_mentioned_or(
     config["prefix"]), intents=intents, help_command=None)
 
@@ -170,19 +169,19 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
-        prompt += "Respond with a condemnation of the message from the author, on behalf of you and the reactor."
+        prompt += "Respond with a condemnation of the message from the author, on behalf of yourself and the reactor."
     
     #say congratulations
     elif any([kwarg == emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
-        prompt += "Respond with congratulations to the message from the author, on behalf of you and the reactor."
+        prompt += "Respond with congratulations to the message from the author, on behalf of yourself and the reactor."
 
     # condolences
     elif any([kwarg == emoji.name for kwarg in ["antisheeee", "low_energy"]]):
-        prompt += "Respond with condolences to the message from the author, on behalf of you and the reactor."
+        prompt += "Respond with condolences to the message from the author, on behalf of yourself and the reactor."
     
     #good answer
     elif any([kwarg == emoji.name for kwarg in ["good_answer"]]):
-        prompt += "Let the author know you like what they said."
+        prompt += "Let the author know you like what they said, or that it was particularly clever."
     
     # caught
     elif any([kwarg == emoji.name for kwarg in ["caught", "cap"]]):
@@ -216,8 +215,9 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
 
     # if the author and reactor are the same person
+    print("eq case", author, reactor, author==reactor)
     if author == reactor:
-        prompt.replace("you and the reactor", "you")
+        prompt = prompt.replace("you and the reactor", "you")
     
     # send message
     async with reaction.message.channel.typing():
