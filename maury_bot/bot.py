@@ -18,9 +18,7 @@ import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from maury_bot.chatgpt3 import chatgpt3
-from maury_bot.cogs.maury import title_list
-
+from maury_bot.chatgpt3 import bot_response
 import exceptions
 
 if not os.path.isfile("config.json"):
@@ -34,32 +32,6 @@ Setup bot intents (events restrictions)
 For more information about intents, please go to the following websites:
 https://discordpy.readthedocs.io/en/latest/intents.html
 https://discordpy.readthedocs.io/en/latest/intents.html#privileged-intents
-
-
-Default Intents:
-intents.bans = True
-intents.dm_messages = True
-intents.dm_reactions = True
-intents.dm_typing = True
-intents.emojis = True
-intents.emojis_and_stickers = True
-intents.guild_messages = True
-intents.guild_reactions = True
-intents.guild_scheduled_events = True
-intents.guild_typing = True
-intents.guilds = True
-intents.integrations = True
-intents.invites = True
-intents.messages = True # `message_content` is required to get the content of the messages
-intents.reactions = True
-intents.typing = True
-intents.voice_states = True
-intents.webhooks = True
-
-Privileged Intents (Needs to be enabled on developer portal of Discord), please use them only if you need them:
-intents.members = True
-intents.message_content = True
-intents.presences = True
 """
 
 # intents = discord.Intents.default()
@@ -75,6 +47,8 @@ If you want to use prefix commands, make sure to also enable the intent below in
 
 bot = Bot(command_prefix=commands.when_mentioned_or(
     config["prefix"]), intents=intents, help_command=None)
+
+#XXX TODO I would prefer to have these attributes belong to a class rather than as global variables
 last_messages = []
 high_activity = False
 
@@ -83,7 +57,6 @@ async def init_db():
         with open("maury_bot/database/schema.sql") as file:
             await db.executescript(file.read())
         await db.commit()
-
 
 """
 Create a bot variable to access the config file in cogs so that you don't need to import it every time.
@@ -135,7 +108,7 @@ async def status_task() -> None:
 
 @tasks.loop(hours=0.5)
 async def maury_activity_level() -> None:
-    global high_activity #XXX bad code bc i dont know what class should be given this attribute
+    global high_activity
     if high_activity:
         # signing off
         print("turning high activity mode off")
@@ -166,7 +139,6 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     reactor = user.display_name
     message_text = reaction.message.content
     author = reaction.message.author.display_name
-    response_text = ""
 
     # break early if not in list of custom reaction list
     if not reaction.is_custom_emoji():
@@ -195,8 +167,6 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         last_messages.pop(0)
 
     prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
-    prompt += "Respond with the personality of a quirky, jaded, seafaring captain named Maury Polse at a fisherman's wharf.\n"
-    prompt += "Tag the author and reactor in the response when mentioning them.\n"
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
@@ -244,24 +214,16 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     else:
         return
+
+    # if the author and reactor are the same person
+    if author == reactor:
+        prompt.replace("you and the reactor", "you")
     
-    # defer response
+    # send message
     async with reaction.message.channel.typing():
-        response_text = chatgpt3(prompt)
-
-        # clean response_text, want to replace names with discord mentions
-        # remove @
-        response_text = response_text.replace("@", "")
-        response_text = response_text.replace(reactor, user.mention)
-        response_text = response_text.replace(author, reaction.message.author.mention)
-
-    await reaction.message.channel.send(response_text)
-    # embed = discord.Embed(
-    #         title=np.random.choice(title_list),
-    #         description=response_text,
-    #         color=0x3256a8
-    #     )
-    # await reaction.message.channel.send(embed=embed)
+        bot_response(context = reaction.message.channel, prompt = prompt, author= reaction.message.author, reactor=user)
+    
+    # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)
 
 @bot.event

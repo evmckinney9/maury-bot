@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 import numpy as np
 from helpers import checks
-from maury_bot.chatgpt3 import chatgpt3
+from maury_bot.chatgpt3 import bot_response
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
 Description:
@@ -45,36 +45,19 @@ class Maury(commands.Cog, name="maury"):
     )
     @checks.not_blacklisted()
     async def movie(self, context: Context) -> None:
-        """
-        :param context: The hybrid command context.
-        """
-        # embed = discord.Embed(
-        #     title="I got a movie for ya jackass,",
-        #     description="Beverely Hills Chihuahua 2 (ó﹏ò｡) ",
-        #     color=0xE02B2B
-        # )
-        # await context.send(embed=embed)
-        await context.defer()  # This will defer the response, so the user will see a loading state
-        # This will prevent your bot from stopping everything when doing a web request - see: https://discordpy.readthedocs.io/en/stable/faq.html#how-do-i-make-a-web-request
         async with aiohttp.ClientSession() as session:
             async with session.get("https://script.google.com/macros/s/AKfycbygn4fG-jiZqmIrqmiSDyzy8cOjeXDHUPAhA5OHVqLPW0WQLhn172dU3b-K5T2eg8pVPw/exec") as request:
                 if request.status == 200:
-                    data = await request.json()
-                    movie_str = data["movie"]
-                    response_text = chatgpt3(f"Drunkedly recommend the movie {movie_str} as a desolate salty sea captain at a fisherman's wharf")
-                    # embed = discord.Embed(
-                    #     title=np.random.choice(self.title_list),
-                    #     description=response_text,
-                    #     color=0x9C84EF
-                    # )
-                    context.send(response_text)
+                    spreadsheet_data = await request.json()
+                    movie_str = spreadsheet_data["movie"]
+                    bot_response(f"Drunkedly recommend the movie {movie_str}")
                 else:
                     embed = discord.Embed(
                         title="Error!",
                         description="There is something wrong with the API, please try again later",
                         color=0xE02B2B
                     )
-                await context.send(embed=embed)
+                    await context.send(embed=embed)
 
     @commands.hybrid_command(
         name="chat",
@@ -87,16 +70,17 @@ class Maury(commands.Cog, name="maury"):
         :param context: The hybrid command context.
         """
         # get requester
-        await context.defer()
-        requester = f"@{context.author.display_name}"
-        response_text = chatgpt3(f"Make a quick, silly yet foreboding greeting to {requester} as a desolate old sea faren captain at a wharf:\n")
-        # embed = discord.Embed(
-        #     title=np.random.choice(self.title_list),
-        #     description=response_text,
-        #     color=0x3256a8
-        # )
-        # await context.send(embed=embed)
-        await context.send(response_text)
+        # await context.defer()
+        async with context.typing():
+            author = f"{context.author.display_name}"
+            response_text = bot_response(f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
+            # embed = discord.Embed(
+            #     title=np.random.choice(self.title_list),
+            #     description=response_text,
+            #     color=0x3256a8
+            # )
+            # await context.send(embed=embed)
+            await context.send(response_text)
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
