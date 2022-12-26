@@ -54,11 +54,11 @@ async def bot_response(context: Context, prompt: str, author: User=None, reactor
     """Create and respond to the prompt with a message to the channel"""
     async with context.typing():
         #personality
-        prompt += "Respond with the personality of a quirky, jaded, desolate, salty seafaring captain named Maury Polse at a fisherman's wharf.\n"
+        prompt += "Respond with the personality of a quirky, jaded, desolate, salty seafaring captain named Maury at a fisherman's wharf.\n"
 
         # small chance he knows his own name
         if random.random() > 0.1:
-            prompt = prompt.replace("named Maury Polse ", "")
+            prompt = prompt.replace("named Maury ", "")
         
         if author is not None:
             prompt += f"Remember that {author.display_name} wrote this message.\n"
