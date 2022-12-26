@@ -1,4 +1,4 @@
-## Python Discord Bot with GPT3 Integration
+## Python Discord Bot with GPT-3 Integration
 
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
