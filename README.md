@@ -19,6 +19,8 @@ ___
 ## Setup
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
 
+Created using this template: https://github.com/kkrypt0nn/Python-Discord-Bot-Template
+
 I use Raspberry Pi OS Lite with this application running in the background using `tmux`.
 
 ### 1. Preliminaries
