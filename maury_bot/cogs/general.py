@@ -59,7 +59,7 @@ class General(commands.Cog, name="general"):
         :param context: The hybrid command context.
         """
         embed = discord.Embed(
-            description="Captain Polse",
+            description="Captain Maury",
             color=0x9C84EF
         )
         embed.set_author(
