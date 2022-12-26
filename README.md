@@ -11,6 +11,10 @@ Send a kind regards, on :joy: emote,
 or a sincere condolence, on :cry: emote.
 ![image](https://user-images.githubusercontent.com/47376937/209484689-79ec9c9b-e990-47fd-b96b-6fc10a0138c0.png)
 
+and of course your server's custom emotes.
+![image](https://user-images.githubusercontent.com/47376937/209485945-fc012e33-9eb9-4174-9bf8-5b253630b8ad.png)
+
+
 ___
 ## Setup
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
