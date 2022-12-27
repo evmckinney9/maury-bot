@@ -1,3 +1,5 @@
 aiohttp
 aiosqlite
 discord.py
+numpy
+openai

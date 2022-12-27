@@ -45,15 +45,15 @@ I use Raspberry Pi OS Lite with this application running in the background using
 - Put API keys into `config.json`
   ```json
   {
-    "token": "YOUR_BOT_TOKEN_HERE",
-    "permissions": "466004442176",
-    "application_id": "YOUR_APPLICATION_ID_HERE",
-    "sync_commands_globally": false,
-    "owners": [
-      "YOUR_DISCORD_USER_ID",
-      502280530520440862
-    ],
-    "openai_api_key": "YOUR_OPENAI_KEY_HERE"
+      "token": "YOUR_BOT_TOKEN_HERE",
+      "permissions": "466004442176",
+      "application_id": "YOUR_APPLICATION_ID_HERE",
+      "sync_commands_globally": false,
+      "owners": [
+          "YOUR_DISCORD_USER_ID",
+          502280530520440862
+      ],
+      "openai_api_key": "YOUR_OPENAI_KEY_HERE"
   }
   ```
 ### 3. Start Application
