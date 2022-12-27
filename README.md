@@ -31,9 +31,9 @@ I use Raspberry Pi OS Lite with this application running in the background using
   - Obtain an Openai API key, https://beta.openai.com/account/api-keys
    
 ### 2. Setup repository
-- Clone, and python virtual enviroment
+- Clone repo, and start python virtual enviroment
   ```shell
-  git clone https://github.com/evmckinney9/maury-bot.git`
+  git clone https://github.com/evmckinney9/maury-bot.git
   cd maury-bot
   python -m venv maury_venv
   python -m pip install -r requirements.txt
