@@ -35,9 +35,9 @@ I use Raspberry Pi OS Lite with this application running in the background using
   ```shell
   git clone https://github.com/evmckinney9/maury-bot.git
   cd maury-bot
-  python -m venv maury_venv
-  python -m pip install -r requirements.txt
+  python3.9 -m venv maury_venv
   source maury_venv/bin/activate
+  python -m pip install -r requirements.txt
   pip install -e .
   touch config.json
   ```
