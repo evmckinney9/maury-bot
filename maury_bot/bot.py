@@ -176,7 +176,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     # here, look at messages in the bot's cache
     # we want to combine from older messages to give the bot more context
-    bot_messages = [m async for m in channel.history(limit=25, oldest_first=False, after=reaction.message.created_at + timedelta(-60))]
+    bot_messages = [m async for m in channel.history(limit=25, after=reaction.message.created_at + timedelta(seconds=-60))]
     bot_messages = filter(lambda m: m.author == reaction.message.author, bot_messages) #filtering by author
     bot_messages = sorted(bot_messages, key=lambda m: m.created_at) #ordering by time
     message_text = " ".join([m.content for m in bot_messages]) #concatenating messages
