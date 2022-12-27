@@ -45,8 +45,7 @@ It is recommended to use slash commands and therefore not use prefix commands.
 If you want to use prefix commands, make sure to also enable the intent below in the Discord developer portal.
 """
 # intents.message_content = True
-bot = Bot(command_prefix=commands.when_mentioned_or(
-    config["prefix"]), intents=intents, help_command=None)
+bot = Bot(command_prefix="/", intents=intents, help_command=None)
 
 #XXX TODO I would prefer to have these attributes belong to a class rather than as global variables
 last_messages = []
@@ -106,13 +105,18 @@ async def status_task() -> None:
     ]
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=random.choice(statuses)))
 
-@tasks.loop(hours=0.5)
+@tasks.loop(seconds=30)
 async def maury_activity_level() -> None:
+    print("into activity loop")
     global high_activity
-    if high_activity:
+    if high_activity ==2:
+        print("acknowledge start")
+        high_activity = 1 #update state
+    elif high_activity == 1:
         # signing off
         print("turning high activity mode off")
-    high_activity = False
+        maury_activity_level.stop()
+        high_activity = 0
 
 @bot.event
 async def on_message(message: discord.Message) -> None:
@@ -128,7 +132,8 @@ async def on_message(message: discord.Message) -> None:
     #TODO could improve this using the discord.Emoji class
     if "<:blep:847691502867316827>" in message.content:
         global high_activity
-        high_activity = True
+        high_activity = 2
+        maury_activity_level.start()
         await message.add_reaction("<in_there:1038609216014921809>")
     await bot.process_commands(message)
 
