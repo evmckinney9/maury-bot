@@ -14,12 +14,16 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
+from maury_bot.chatgpt3 import ChatGPTWrap
 import numpy as np
 from helpers import checks
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from maury_bot.persona import AbstractBot
 
 
 class General(commands.Cog, name="general"):
-    def __init__(self, bot):
+    def __init__(self, bot: AbstractBot):
         self.bot = bot
 
     @commands.hybrid_command(
@@ -30,59 +34,6 @@ class General(commands.Cog, name="general"):
     async def help(self, context: Context) -> None:
         embed = discord.Embed(
             title="Hey Kid,", description="scram", color=0x9C84EF)
-        await context.send(embed=embed)
-    # async def help(self, context: Context) -> None:
-    #     prefix = self.bot.config["prefix"]
-    #     embed = discord.Embed(
-    #         title="Help", description="List of available commands:", color=0x9C84EF)
-    #     for i in self.bot.cogs:
-    #         cog = self.bot.get_cog(i.lower())
-    #         commands = cog.get_commands()
-    #         data = []
-    #         for command in commands:
-    #             description = command.description.partition('\n')[0]
-    #             data.append(f"{prefix}{command.name} - {description}")
-    #         help_text = "\n".join(data)
-    #         embed.add_field(name=i.capitalize(),
-    #                         value=f'```{help_text}```', inline=False)
-        # await context.send(embed=embed)
-
-    @commands.hybrid_command(
-        name="botinfo",
-        description="Get some useful (or not) information about the bot.",
-    )
-    @checks.not_blacklisted()
-    async def botinfo(self, context: Context) -> None:
-        """
-        Get some useful (or not) information about the bot.
-
-        :param context: The hybrid command context.
-        """
-        embed = discord.Embed(
-            description="Captain Maury",
-            color=0x9C84EF
-        )
-        embed.set_author(
-            name="Bot Information"
-        )
-        embed.add_field(
-            name="Owner:",
-            value="evmckinney9#8098",
-            inline=True
-        )
-        embed.add_field(
-            name="Python Version:",
-            value=f"{platform.python_version()}",
-            inline=True
-        )
-        embed.add_field(
-            name="Prefix:",
-            value=f"/ (Slash Commands)",
-            inline=False
-        )
-        embed.set_footer(
-            text=f"Requested by {context.author}"
-        )
         await context.send(embed=embed)
 
     @commands.hybrid_command(
@@ -104,43 +55,47 @@ class General(commands.Cog, name="general"):
             color=0x9C84EF
         )
         await context.send(embed=embed)
-        
+    
+    
     @commands.hybrid_command(
-        name="bitcoin",
-        description="Get the current price of bitcoin.",
+        name="chat",
+        # description=f"Hey {self.bot.name}, How are you doing today?",
+        description="How are you doing today?",
     )
+    
     @checks.not_blacklisted()
-    async def bitcoin(self, context: Context) -> None:
+    async def chat(self, context: Context) -> None:
         """
-        Get the current price of bitcoin.
-
         :param context: The hybrid command context.
         """
-        embed = discord.Embed(
-            title="Error!",
-            description= "bitcoin bad",
-            color=0xE02B2B
-        )
-        await context.send(embed=embed)
+        # get requester
+        # await context.defer()
+        author = f"{context.author.display_name}    "
+        await self.bot.get_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
 
-        # # This will prevent your bot from stopping everything when doing a web request - see: https://discordpy.readthedocs.io/en/stable/faq.html#how-do-i-make-a-web-request
-        # async with aiohttp.ClientSession() as session:
-        #     async with session.get("https://api.coindesk.com/v1/bpi/currentprice/BTC.json") as request:
-        #         if request.status == 200:
-        #             data = await request.json(
-        #                 content_type="application/javascript")  # For some reason the returned content is of type JavaScript
-        #             embed = discord.Embed(
-        #                 title="Bitcoin price",
-        #                 description=f"The current price is {data['bpi']['USD']['rate']} :dollar:",
-        #                 color=0x9C84EF
-        #             )
-        #         else:
-        #             embed = discord.Embed(
-        #                 title="Error!",
-        #                 description="There is something wrong with the API, please try again later",
-        #                 color=0xE02B2B
-        #             )
-        #         await context.send(embed=embed)
+    
+    # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
+    @commands.hybrid_command(
+        name="movie",
+        # description=f"Hey {self.bot.name}, What movie should I watch?",
+        description="What movie should I watch?",
+    )
+    @checks.not_blacklisted()
+    async def movie(self, context: Context) -> None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://script.google.com/macros/s/AKfycbygn4fG-jiZqmIrqmiSDyzy8cOjeXDHUPAhA5OHVqLPW0WQLhn172dU3b-K5T2eg8pVPw/exec") as request:
+                if request.status == 200:
+                    spreadsheet_data = await request.json()
+                    movie_str = spreadsheet_data["movie"]
+                    await self.bot.bot_response(context=context, prompt=f"Recommend the movie {movie_str}")
+                else:
+                    embed = discord.Embed(
+                        title="Error!",
+                        description="There is something wrong with the API, please try again later",
+                        color=0xE02B2B
+                    )
+                    await context.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(General(bot))

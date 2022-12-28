@@ -17,10 +17,12 @@ import sys
 import aiosqlite
 import discord
 from discord.ext import commands, tasks
-from discord.ext.commands import Bot, Context
-from maury_bot.chatgpt3 import bot_response
+from discord.ext.commands import Context
 from datetime import timedelta
+from maury_bot.persona import MauryBot 
 import exceptions
+
+
 
 if not os.path.isfile("config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
@@ -28,34 +30,6 @@ else:
     with open("config.json") as file:
         config = json.load(file)
 
-"""	
-Setup bot intents (events restrictions)
-For more information about intents, please go to the following websites:
-https://discordpy.readthedocs.io/en/latest/intents.html
-https://discordpy.readthedocs.io/en/latest/intents.html#privileged-intents
-"""
-
-# intents = discord.Intents.default()
-intents = discord.Intents.all()
-
-"""
-Uncomment this if you don't want to use prefix (normal) commands.
-It is recommended to use slash commands and therefore not use prefix commands.
-
-If you want to use prefix commands, make sure to also enable the intent below in the Discord developer portal.
-"""
-# intents.message_content = True
-bot = Bot(command_prefix="/", intents=intents, help_command=None)
-
-#XXX TODO I would prefer to have these attributes belong to a class rather than as global variables
-last_messages = []
-high_activity = False
-
-async def init_db():
-    async with aiosqlite.connect("maury_bot/database/database.db") as db:
-        with open("maury_bot/database/schema.sql") as file:
-            await db.executescript(file.read())
-        await db.commit()
 
 """
 Create a bot variable to access the config file in cogs so that you don't need to import it every time.
@@ -64,7 +38,14 @@ The config is available using the following code:
 - bot.config # In this file
 - self.bot.config # In cogs
 """
+bot = MauryBot()
 bot.config = config
+
+async def init_db():
+    async with aiosqlite.connect("maury_bot/database/database.db") as db:
+        with open("maury_bot/database/schema.sql") as file:
+            await db.executescript(file.read())
+        await db.commit()
 
 
 @bot.event
@@ -77,7 +58,8 @@ async def on_ready() -> None:
     print(f"Python version: {platform.python_version()}")
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     print("-------------------")
-    status_task.start()
+    if not status_task.is_running():
+        status_task.start()
     if config["sync_commands_globally"]:
         print("Syncing commands globally...")
         await bot.tree.sync()
@@ -90,33 +72,19 @@ async def status_task() -> None:
     """
     if np.random.random() < 0.05:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="the sunset"))
-
-    statuses = [
-        "the lapping of the waves against the pier",
-        "the snapping of a flag in the breeze",
-        "the scuffle of feet from dock workers",
-        "the clang of a boat's bell",
-        "the rattle of the mooring chains",
-        "the chatter of fishermen",
-        "the low hum of boat engines",
-        "the distant rumble of thunder",
-        "the gentle clinking of fishing lines",
-        "the thrum of heavy cargo machinery",
-    ]
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=random.choice(statuses)))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=bot.get_status()))
 
 @tasks.loop(seconds=30)
-async def maury_activity_level() -> None:
+async def bot_activity_level() -> None:
     print("into activity loop")
-    global high_activity
-    if high_activity ==2:
+    if bot.high_activity ==2:
         print("acknowledge start")
-        high_activity = 1 #update state
-    elif high_activity == 1:
+        bot.high_activity = 1 #update state
+    elif bot.high_activity == 1:
         # signing off
         print("turning high activity mode off")
-        maury_activity_level.stop()
-        high_activity = 0
+        bot_activity_level.stop()
+        bot.high_activity = 0
 
 @bot.event
 async def on_message(message: discord.Message) -> None:
@@ -131,9 +99,8 @@ async def on_message(message: discord.Message) -> None:
     #check if message contains meeka blep, then turn on high activity mode
     #TODO could improve this using the discord.Emoji class
     if "<:blep:847691502867316827>" in message.content:
-        global high_activity
-        high_activity = 2
-        maury_activity_level.start()
+        bot.high_activity = 2
+        bot_activity_level.start()
         await message.add_reaction("<in_there:1038609216014921809>")
     await bot.process_commands(message)
 
@@ -157,21 +124,20 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
 
     # check where last response was to avoid double responding
-    if reaction.message.id in last_messages:
+    if reaction.message.id in bot.responded_to_messages:
         return
     
     # probability of reacting, banned has 1, otherwise .05
     react_probability = 0.05
-    global high_activity
-    if not high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
+    if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
     # add message to cache to avoid double responding
-    last_messages.append(reaction.message.id)
+    bot.responded_to_messages.append(reaction.message.id)
 
     # if cache is too large, remove oldest message
-    if len(last_messages) > 25:
-        last_messages.pop(0)
+    if len(bot.responded_to_messages) > 25:
+        bot.responded_to_messages.pop(0)
 
 
     # here, look at messages in the bot's cache
@@ -240,7 +206,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         prompt = prompt.replace("yourself and the reactor", "yourself")
     
     # send message
-    await bot_response(context = channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= mentions)
+    await bot.get_response(context = channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= mentions)
     
     # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)
@@ -340,7 +306,6 @@ async def load_cogs() -> None:
             except Exception as e:
                 exception = f"{type(e).__name__}: {e}"
                 print(f"Failed to load extension {extension}\n{exception}")
-
 
 asyncio.run(init_db())
 asyncio.run(load_cogs())

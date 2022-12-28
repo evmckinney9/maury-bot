@@ -6,6 +6,7 @@ from discord.ext.commands import Context
 import numpy as np
 from helpers import checks
 from maury_bot.chatgpt3 import bot_response
+from abc import ABC, abstractmethod
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
 Description:
@@ -19,29 +20,29 @@ from discord.ext.commands import Context
 
 from helpers import checks
 
-title_list = [
-        "*Gulp*",
-        "*Cough*",
-        "*Grunt*",
-        "*Hyeem*",
-        "*Heem*",
-        "*Ahem*",
-        "*Hmm*",
-        "*Hobble*",
-        "*Wheeze*",
-        "*Sigh*",
-]
+# title_list = [
+#         "*Gulp*",
+#         "*Cough*",
+#         "*Grunt*",
+#         "*Hyeem*",
+#         "*Heem*",
+#         "*Ahem*",
+#         "*Hmm*",
+#         "*Hobble*",
+#         "*Wheeze*",
+#         "*Sigh*",
+# ]
 
 # Here we name the cog and create a new class for the cog.
-class Maury(commands.Cog, name="maury"):
+class Persona(commands.Cog, name="persona"):
     def __init__(self, bot):
         self.bot = bot
-        self.title_list = title_list
+        # self.title_list = title_list
 
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     @commands.hybrid_command(
         name="movie",
-        description="Hey Maury, what movie should I watch?",
+        description="What movie should I watch?",
     )
     @checks.not_blacklisted()
     async def movie(self, context: Context) -> None:
@@ -50,7 +51,7 @@ class Maury(commands.Cog, name="maury"):
                 if request.status == 200:
                     spreadsheet_data = await request.json()
                     movie_str = spreadsheet_data["movie"]
-                    await bot_response(context=context, prompt=f"Drunkedly recommend the movie {movie_str}")
+                    await bot_response(context=context, prompt=f"Recommend the movie {movie_str}")
                 else:
                     embed = discord.Embed(
                         title="Error!",
@@ -61,7 +62,7 @@ class Maury(commands.Cog, name="maury"):
 
     @commands.hybrid_command(
         name="chat",
-        description="Hey Maury, how are you doing today?",
+        description="How are you doing today?",
     )
     
     @checks.not_blacklisted()
@@ -76,4 +77,4 @@ class Maury(commands.Cog, name="maury"):
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
-    await bot.add_cog(Maury(bot))
+    await bot.add_cog(Persona(bot))
