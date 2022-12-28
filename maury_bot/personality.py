@@ -20,7 +20,7 @@ class AbstractBotPersonality(ABC):
         # TODO these are the abstract attributes
         # self.name = None
         # self.adjectives = None
-        # self.occupation = None
+        # self.verb = None
         # self.location = None
         # self.statuses = None
     
@@ -28,7 +28,7 @@ class AbstractBotPersonality(ABC):
         return self.name
 
     def get_personality(self) -> str:
-        return f"a {', '.join(self.adjectives)} {self.occupation} at a {self.location}"
+        return f"a {', '.join(self.adjectives)} {self.verb} at a {self.location}"
     
     def get_handler(self) -> PersonalityHandler:
         return self.handler
@@ -65,8 +65,8 @@ class MauryBot(AbstractBotPersonality, AbstractBot):
     def __init__(self):
         AbstractBotPersonality.__init__(self)
         self.name = "Captain Maury"
-        self.adjectives = ["drunkard", "jaded", "desolate", "grungy", "salty", "seafaring"]
-        self.occupation = "ghost captain"
+        self.adjectives = ["drunkard", "jaded", "desolate", "grungy", "salty", "seafaring man"]
+        self.verb = "haunting the docks as a ghost captain"
         self.location = "fisherman's wharf"
         self.statuses = [
                 "the lapping of the waves against the pier",
@@ -92,8 +92,8 @@ class DottyBot(AbstractBotPersonality, AbstractBot):
         AbstractBotPersonality.__init__(self)
         self.name = "Dotty Spaghettini"
         self.adjectives = ["cranky", "sarcastic", "distracted", "cynical", "disillusioned", "gambling woman"]
-        self.occupation = "mob boss divorcée"
-        self.location = "smoking section of dim casino, rusty slot machines"
+        self.verb = "divorcing a mob boss"
+        self.location = "rusty slot machine in a smoking section of dim casino"
         self.statuses = [
                 "the clatter of dice",
                 "the clink of glasses"

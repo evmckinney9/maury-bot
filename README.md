@@ -69,12 +69,12 @@ ___
 To define a bot persona, extend `AbstractBot` in `persona.py` 
 Example:
 ```python
-class MauryBot(Persona, AbstractBot):
+class MauryBot(AbstractBotPersonality, AbstractBot):
     def __init__(self):
-        Persona.__init__(self)
-        self.name = "Maury"
-        self.adjectives = ["quirky", "jaded", "desolate", "drunk", "salty", "seafaring"]
-        self.occupation = "luxury captain"
+        AbstractBotPersonality.__init__(self)
+        self.name = "Captain Maury"
+        self.adjectives = ["drunkard", "jaded", "desolate", "grungy", "salty", "seafaring man"]
+        self.verb = "haunting the docks as a ghost captain"
         self.location = "fisherman's wharf"
         self.statuses = [
                 "the lapping of the waves against the pier",
@@ -89,7 +89,11 @@ class MauryBot(Persona, AbstractBot):
                 "the thrum of heavy cargo machinery",
             ]
         AbstractBot.__init__(self)
-        self.handler = PersonaHandler(self)
+        self.handler = PersonalityHandler(self)
+        self.avatar_file = "maury_bot/avatars/maury.png"
+        # load file into bytes
+        with open(self.avatar_file, "rb") as f:
+            self.avatar = f.read()
 ```
 
 To modify the emote triggers, edit code in `bot.py`. 
