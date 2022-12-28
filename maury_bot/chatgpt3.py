@@ -9,10 +9,10 @@ import re
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from maury_bot.persona import AbstractBot
+    from maury_bot.personality import Persona
 
-class PersonaHandler():
-    def __init__(self, persona: AbstractBot):
+class PersonalityHandler():
+    def __init__(self, persona: Persona):
         self.personality = persona.get_personality()
         self.name = persona.get_name()
     
@@ -22,7 +22,7 @@ class PersonaHandler():
         return messager.bot_response()
     
     class MessageHandler():
-        def __init__(self, personaHandler: PersonaHandler, context:Context, prompt:str, **kwargs):
+        def __init__(self, personaHandler: PersonalityHandler, context:Context, prompt:str, **kwargs):
             self.personality = personaHandler.personality
             self.name = personaHandler.name
             self.context = context

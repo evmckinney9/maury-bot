@@ -11,19 +11,17 @@ import random
 
 import aiohttp
 import discord
-from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
-from maury_bot.chatgpt3 import ChatGPTWrap
 import numpy as np
 from helpers import checks
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from maury_bot.persona import AbstractBot
+    from maury_bot.bot import AbstractBot
 
 
 class General(commands.Cog, name="general"):
-    def __init__(self, bot: AbstractBot):
+    def __init__(self, bot: "AbstractBot"):
         self.bot = bot
 
     @commands.hybrid_command(
@@ -55,25 +53,7 @@ class General(commands.Cog, name="general"):
             color=0x9C84EF
         )
         await context.send(embed=embed)
-    
-    
-    @commands.hybrid_command(
-        name="chat",
-        # description=f"Hey {self.bot.name}, How are you doing today?",
-        description="How are you doing today?",
-    )
-    
-    @checks.not_blacklisted()
-    async def chat(self, context: Context) -> None:
-        """
-        :param context: The hybrid command context.
-        """
-        # get requester
-        # await context.defer()
-        author = f"{context.author.display_name}    "
-        await self.bot.get_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
-
-    
+       
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     @commands.hybrid_command(
         name="movie",
@@ -95,7 +75,6 @@ class General(commands.Cog, name="general"):
                         color=0xE02B2B
                     )
                     await context.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(General(bot))

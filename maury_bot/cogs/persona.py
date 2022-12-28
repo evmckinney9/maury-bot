@@ -5,8 +5,10 @@ from discord.ext import commands
 from discord.ext.commands import Context
 import numpy as np
 from helpers import checks
-from maury_bot.chatgpt3 import bot_response
-from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from maury_bot.personality import VariablePersonaBot
+
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
 Description:
@@ -35,30 +37,9 @@ from helpers import checks
 
 # Here we name the cog and create a new class for the cog.
 class Persona(commands.Cog, name="persona"):
-    def __init__(self, bot):
+    def __init__(self, bot: "VariablePersonaBot"):
         self.bot = bot
         # self.title_list = title_list
-
-    # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
-    @commands.hybrid_command(
-        name="movie",
-        description="What movie should I watch?",
-    )
-    @checks.not_blacklisted()
-    async def movie(self, context: Context) -> None:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://script.google.com/macros/s/AKfycbygn4fG-jiZqmIrqmiSDyzy8cOjeXDHUPAhA5OHVqLPW0WQLhn172dU3b-K5T2eg8pVPw/exec") as request:
-                if request.status == 200:
-                    spreadsheet_data = await request.json()
-                    movie_str = spreadsheet_data["movie"]
-                    await bot_response(context=context, prompt=f"Recommend the movie {movie_str}")
-                else:
-                    embed = discord.Embed(
-                        title="Error!",
-                        description="There is something wrong with the API, please try again later",
-                        color=0xE02B2B
-                    )
-                    await context.send(embed=embed)
 
     @commands.hybrid_command(
         name="chat",
@@ -73,7 +54,19 @@ class Persona(commands.Cog, name="persona"):
         # get requester
         # await context.defer()
         author = f"{context.author.display_name}"
-        await bot_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}", author=context.author)
+        print("who is this", author) #DEBUGGING
+        await self.bot.get_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}.", author=context.author)
+
+    @commands.hybrid_command(
+        name="switch",
+        description="Switch to a different persona",
+    )
+    @checks.not_blacklisted()
+    async def switch(self, context: Context) -> None:
+        self.bot.switch_to() #None param just rotates through personas
+        await self.bot.discord_refresh_persona()
+        # say hello
+        await self.chat(context)
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):

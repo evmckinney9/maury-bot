@@ -19,8 +19,9 @@ import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from datetime import timedelta
-from maury_bot.persona import MauryBot 
+from maury_bot.personality import VariablePersonaBot 
 import exceptions
+from maury_bot.cogs.persona import Persona
 
 
 
@@ -38,7 +39,7 @@ The config is available using the following code:
 - bot.config # In this file
 - self.bot.config # In cogs
 """
-bot = MauryBot()
+bot = VariablePersonaBot()
 bot.config = config
 
 async def init_db():
@@ -46,7 +47,6 @@ async def init_db():
         with open("maury_bot/database/schema.sql") as file:
             await db.executescript(file.read())
         await db.commit()
-
 
 @bot.event
 async def on_ready() -> None:
@@ -63,7 +63,8 @@ async def on_ready() -> None:
     if config["sync_commands_globally"]:
         print("Syncing commands globally...")
         await bot.tree.sync()
-
+    #reset bot persona
+    await bot.discord_refresh_persona()
 
 @tasks.loop(hours=8)
 async def status_task() -> None:
@@ -128,7 +129,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
     
     # probability of reacting, banned has 1, otherwise .05
-    react_probability = 0.05
+    react_probability = 1 #0.05
     if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
