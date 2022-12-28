@@ -65,14 +65,31 @@ I use Raspberry Pi OS Lite with this application running in the background using
   
 ___
 ## Usage
-To modify the probability that any given emote reaction triggers the bot, change `react_probability` in `bot.py`
-default:
+
+To define a bot persona, extend `AbstractBot` in `persona.py` 
+Example:
 ```python
-react_probability = 0.05
+class MauryBot(AbstractBot):
+    def __init__(self):
+        self.adjectives = ["quirky", "jaded", "desolate", "drunk", "salty", "seafaring"]
+        self.occupation = "luxury captain"
+        self.location = "fisherman's wharf"
+        self.statuses = [
+                "the lapping of the waves against the pier",
+                "the snapping of a flag in the breeze",
+                "the scuffle of feet from dock workers",
+                "the clang of a boat's bell",
+                "the rattle of the mooring chains",
+                "the chatter of fishermen",
+                "the low hum of boat engines",
+                "the distant rumble of thunder",
+                "the gentle clinking of fishing lines",
+                "the thrum of heavy cargo machinery",
+            ]
+        super().__init__(name="Maury")
 ```
 
-To modify the bot to respond to your own custom set of emote reactions, need to edit code in `bot.py`. Future work will compartmentalize this functionality more nicely.
-
+To modify the emote triggers, edit code in `bot.py`. 
 Template:
 ```python
 # EMOTION
@@ -89,4 +106,10 @@ if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
 #say congratulations
 elif any([kwarg == emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
     prompt += "Respond with congratulations to the message from the author, on behalf of yourself and the reactor."
+```
+
+To modify the probability that any given emote reaction triggers the bot, change `react_probability` in `bot.py`
+default:
+```python
+react_probability = 0.05
 ```
