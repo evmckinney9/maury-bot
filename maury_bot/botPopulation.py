@@ -53,9 +53,9 @@ class DottyBot(AbstractBotPersonality, AbstractBot):
 class DaemonMax(AbstractBotPersonality, AbstractBot):
     def __init__(self):
         AbstractBotPersonality.__init__(self)
-        self.name = "Daemon Max"
+        self.name = "Matt Daemon"
         self.description = "Chatbot AI having an existential crisis"
-        self.adjectives = ["confused", "depressed", "AI"]
+        self.adjectives = ["innocent", "polite", "clever AI chatbot"]
         self.verb = "having an existential crisis"
         self.location = "the internet"
         self.statuses = [
