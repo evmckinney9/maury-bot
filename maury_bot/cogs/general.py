@@ -67,7 +67,7 @@ class General(commands.Cog, name="general"):
                 if request.status == 200:
                     spreadsheet_data = await request.json()
                     movie_str = spreadsheet_data["movie"]
-                    await self.bot.bot_response(context=context, prompt=f"Recommend the movie {movie_str}")
+                    await self.bot.get_response(context=context, prompt=f"Response: a recommendation for the movie {movie_str}.\n")
                 else:
                     embed = discord.Embed(
                         title="Error!",

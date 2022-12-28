@@ -59,54 +59,14 @@ class AbstractBot(ABC, Bot):
     def get_status(self) -> str:
         return random.choice(self.statuses)
 
-# NOTE order matters here
-# multiple inheritance points get_personality to the Persona class
-class MauryBot(AbstractBotPersonality, AbstractBot):
-    def __init__(self):
-        AbstractBotPersonality.__init__(self)
-        self.name = "Captain Maury"
-        self.adjectives = ["drunkard", "jaded", "desolate", "grungy", "salty", "seafaring man"]
-        self.verb = "haunting the docks as a ghost captain"
-        self.location = "fisherman's wharf"
-        self.statuses = [
-                "the lapping of the waves against the pier",
-                "the snapping of a flag in the breeze",
-                "the scuffle of feet from dock workers",
-                "the clang of a boat's bell",
-                "the rattle of the mooring chains",
-                "the chatter of fishermen",
-                "the low hum of boat engines",
-                "the distant rumble of thunder",
-                "the gentle clinking of fishing lines",
-                "the thrum of heavy cargo machinery",
-            ]
-        AbstractBot.__init__(self)
-        self.handler = PersonalityHandler(self)
-        self.avatar_file = "maury_bot/avatars/maury.png"
-        # load file into bytes
-        with open(self.avatar_file, "rb") as f:
-            self.avatar = f.read()
-
-class DottyBot(AbstractBotPersonality, AbstractBot):
-    def __init__(self):
-        AbstractBotPersonality.__init__(self)
-        self.name = "Dotty Spaghettini"
-        self.adjectives = ["cranky", "sarcastic", "distracted", "cynical", "disillusioned", "gambling woman"]
-        self.verb = "divorcing a mob boss"
-        self.location = "rusty slot machine in a smoking section of dim casino"
-        self.statuses = [
-                "the clatter of dice",
-                "the clink of glasses"
-            ]
-        AbstractBot.__init__(self)
-        self.handler = PersonalityHandler(self)
-        self.avatar_file = "maury_bot/avatars/dotty.png"
-        # load file into bytes
-        with open(self.avatar_file, "rb") as f:
-            self.avatar = f.read()
-
 class VariablePersonaBot(AbstractBot):
-    def __init__(self, persona: AbstractBotPersonality = MauryBot()):
+    def __init__(self, persona: AbstractBotPersonality = None):
+        
+        # sets the default persona to DaemonMax
+        if persona is None:
+            from maury_bot.botPopulation import DaemonMax
+            persona = DaemonMax()
+
         self.current_bot = None
         self.get_name = None
         self.get_personality = None
@@ -119,6 +79,8 @@ class VariablePersonaBot(AbstractBot):
         super().__init__()
 
     def switch_to(self, bot: AbstractBotPersonality=None):
+        from maury_bot.botPopulation import MauryBot, DottyBot, DaemonMax
+
         """Switches the current bot to the given bot"""
         if bot is None and isinstance(self.current_bot, MauryBot):
             bot = DottyBot()

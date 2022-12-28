@@ -7,7 +7,7 @@ import numpy as np
 from helpers import checks
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from maury_bot.personality import VariablePersonaBot
+    from maury_bot.variableBot import VariablePersonaBot
 
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
@@ -55,7 +55,7 @@ class Persona(commands.Cog, name="persona"):
         # await context.defer()
         author = f"{context.author.display_name}"
         print("who is this", author) #DEBUGGING
-        await self.bot.get_response(context=context, prompt=f"Make a quick, silly yet foreboding greeting to {author}.", author=context.author)
+        await self.bot.get_response(context=context, prompt=f"A brief, silly yet foreboding greeting to {author}.\n", author=context.author)
 
     @commands.hybrid_command(
         name="switch",

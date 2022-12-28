@@ -9,7 +9,7 @@ import re
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from maury_bot.personality import Persona
+    from maury_bot.variableBot import Persona
 
 class PersonalityHandler():
     def __init__(self, persona: Persona):
@@ -44,16 +44,22 @@ class PersonalityHandler():
 
         def prompt_cleaner(self, prompt: str) -> str:
             #personality
-            prompt += f"Respond using personality of {self.personality}\n"
+            prompt += f"Write the text message response using personality of: {self.personality}\n"
 
-            # small chance theu knows their own name
+            # small chance they knows their own name
             if random.random() > 0.1:
                 prompt = prompt.replace(f"named {self.name} ", "")
             
+            # only chance to mention current location
+            if random.random() > 0.15:
+                # prompt = prompt.replace(f"at a {self.personality.location} ", "")
+                # use regular expression to remove location, multi-word until next new line
+                prompt = re.sub(r"at a [a-zA-Z ]+\n", ".\n", prompt)
+            
             if self.author is not None:
-                prompt += f"Remember that {self.author.display_name} wrote this message.\n"
+                prompt += f"Remember that {self.author.display_name} wrote this message and mention them.\n"
             if self.reactor is not None and self.reactor != self.author:
-                prompt += f"Remember that {self.reactor.display_name} reacted to the message.\n"
+                prompt += f"Remember that {self.reactor.display_name} reacted to the message and mention them.\n"
 
             # parsed for tagged user in the original message part of the prompt
             if self.mentions is not None:
@@ -100,12 +106,14 @@ class PersonalityHandler():
             kwargs= {
                 "model": "text-davinci-003",
                 "prompt": prompt,
-                "max_tokens": 128,
+                "max_tokens": 140,
                 "temperature": 1,
                 "top_p": 1,
                 "n": 1,
                 "stream": False,
                 "logprobs": None,
+                "presence_penalty": .5,
+                "frequency_penalty": .5,
             }
 
             # generate a response

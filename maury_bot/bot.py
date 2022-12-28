@@ -19,7 +19,7 @@ import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from datetime import timedelta
-from maury_bot.personality import VariablePersonaBot 
+from maury_bot.variableBot import VariablePersonaBot 
 import exceptions
 from maury_bot.cogs.persona import Persona
 
@@ -156,56 +156,62 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
-        prompt += "Respond with a condemnation of the message from the author, on behalf of yourself and the reactor."
+        prompt += "Response: a condemnation of the message from the author, on behalf of yourself and the reactor.\n"
     
     #say congratulations
-    elif any([kwarg == emoji.name for kwarg in ["sheeee", "flawless_victory", "ole", "pog"]]):
-        prompt += "Respond with congratulations to the message from the author, on behalf of yourself and the reactor."
+    elif any([kwarg == emoji.name for kwarg in ["flawless_victory", "ole", "pog"]]):
+        prompt += "Response: congratulations to the message from the author, on behalf of yourself and the reactor.\n"
+
+    elif any([kwarg == emoji.name for kwarg in ["sheeee"]]):
+        prompt += "Response: exicted by the message from the author, on behalf of yourself and the reactor.\n"
 
     # condolences
     elif any([kwarg == emoji.name for kwarg in ["antisheeee", "low_energy"]]):
-        prompt += "Respond with condolences to the message from the author, on behalf of yourself and the reactor."
+        prompt += "Response: condolences to the message from the author, on behalf of yourself and the reactor.\n"
     
     #good answer
     elif any([kwarg == emoji.name for kwarg in ["good_answer"]]):
-        prompt += "Let the author know you like what they said, or that it was particularly clever."
+        prompt += "Response: you like what they said, and that it was particularly clever.\n"
     
     # caught
     elif any([kwarg == emoji.name for kwarg in ["caught", "cap"]]):
-        prompt += "Respond that you and the reactor have both caught the author in a lie."
+        prompt += "Response: you and the reactor have both caught the author in a lie.\n"
     
     # drool
     elif any([kwarg == emoji.name for kwarg in ["drool"]]):
-        prompt += "Let the author know you and the reactor are both drooling over their message."
+        prompt += "Response: you and the reactor are both drooling over their message.\n"
     
     # sus
     elif any([kwarg == emoji.name for kwarg in ["sus", "terio"]]):
-        prompt += "Let the author know you and the reactor think they are acting suspicious."
+        prompt += "Response: you and the reactor think they are acting suspicious.\n"
     
     # shock
     elif any([kwarg == emoji.name for kwarg in ["shock"]]):
-        prompt += "Let the author know you and the reactor are shocked by their message."
+        prompt += "Response: you and the reactor are shocked by their message.\n"
 
     # lul
     elif any([kwarg == emoji.name for kwarg in ["lul"]]):
-        prompt += "Let the author know you and the reactor are laughing at their message."
+        prompt += "Response: you and the reactor are laughing at their message.\n"
     
     #joy
     elif any([kwarg == emoji.name for kwarg in ["joy"]]):
-        prompt += "Let the author know you and the reactor are joyful about their message."
+        prompt += "Response: you and the reactor are joyful about their message.\n"
 
     #facepalm
     elif any([kwarg == emoji.name for kwarg in ["facepalm"]]):
-        prompt += "Let the author know you and the reactor are facepalming at their message."
+        prompt += "Response: you and the reactor are facepalming at their message.\n"
 
     else:
         return
 
     # if the author and reactor are the same person
     if author == reactor:
+        #NOTE order matters
+        prompt = prompt.replace("you and the reactor are both", "you are")
+        prompt = prompt.replace("you and the reactor have both", "you have")
         prompt = prompt.replace("you and the reactor", "you")
         prompt = prompt.replace("yourself and the reactor", "yourself")
-    
+     
     # send message
     await bot.get_response(context = channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= mentions)
     
