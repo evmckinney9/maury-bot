@@ -66,15 +66,16 @@ I use Raspberry Pi OS Lite with this application running in the background using
 ___
 ## Usage
 
-To define a bot persona, extend `AbstractBot` in `persona.py` 
+To define a bot persona, extend `AbstractBot` in `botPopulation.py` 
 Example:
 ```python
 class MauryBot(AbstractBotPersonality, AbstractBot):
     def __init__(self):
         AbstractBotPersonality.__init__(self)
         self.name = "Captain Maury"
-        self.adjectives = ["drunkard", "jaded", "desolate", "grungy", "salty", "seafaring man"]
-        self.verb = "haunting the docks as a ghost captain"
+        self.description = "The Desolate of Foggy Dock"
+        self.adjectives = ["desolate", "grungy", "seafaring ghost captain"]
+        self.verb = "haunting the docks"
         self.location = "fisherman's wharf"
         self.statuses = [
                 "the lapping of the waves against the pier",
