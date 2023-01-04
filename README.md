@@ -121,3 +121,25 @@ default:
 ```python
 react_probability = 0.05
 ```
+
+## Debugging
+When debugging persona keywords/GPT queries, it is useful to have a mode that always responds so you can test the changes more rapidly. The simplest way is to change the `react_probability=1` and test in a private discord channel to avoid spamming other members. In addition, here are some other settings I find useful:
+If you want to set high activity mode (react_probability=1 for 30 minutes), modify `bot.py` with your own emote ids here.
+```python
+@bot.event
+async def on_message(message: discord.Message) -> None:
+    ...
+    if "<trigger:emote>" in message.content:
+        bot.high_activity = 2
+        bot_activity_level.start()
+        await message.add_reaction("<acknowledge:emote>")
+    ...
+```
+
+Also, note that I have added my "banned" emoji to always take precendence over the variable chance.
+```python
+# probability of reacting, banned has 1, otherwise .05
+    react_probability = 1 #0.05
+    if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
+        return
+```
