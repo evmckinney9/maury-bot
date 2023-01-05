@@ -14,6 +14,9 @@ or a sincere condolence, on :cry: emote.
 and of course your server's custom emotes.
 ![image](https://user-images.githubusercontent.com/47376937/209485945-fc012e33-9eb9-4174-9bf8-5b253630b8ad.png)
 
+Use `\chat` to get a "Hello, World!" message.
+
+![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
 ___
 ## Setup
