@@ -64,8 +64,9 @@ class VariablePersonaBot(AbstractBot):
         
         # sets the default persona to DaemonMax
         if persona is None:
-            from maury_bot.botPopulation import DaemonMax
-            persona = DaemonMax()
+            from maury_bot.botPopulation import MauryBot, DottyBot, DaemonMax
+            persona = MauryBot()
+            # persona = DaemonMax()
 
         self.current_bot = None
         self.get_name = None

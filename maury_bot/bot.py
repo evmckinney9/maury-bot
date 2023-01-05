@@ -158,6 +158,10 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
         prompt += "Response: a condemnation of the message from the author, on behalf of yourself and the reactor.\n"
     
+    # inappropriate
+    if any([kwarg == emoji.name for kwarg in ["inappropriate"]]):
+        prompt += "Response: the message from the author is inappropriate, on behalf of yourself and the reactor.\n"
+    
     #say congratulations
     elif any([kwarg == emoji.name for kwarg in ["flawless_victory", "ole", "pog"]]):
         prompt += "Response: congratulations to the message from the author, on behalf of yourself and the reactor.\n"
