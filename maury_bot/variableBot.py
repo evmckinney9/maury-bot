@@ -98,6 +98,9 @@ class VariablePersonaBot(AbstractBot):
     #XXX careful, rate limiting prevents this from being called, only once every 10 minutes (?)
     async def discord_refresh_persona(self):
         """Updates the bot's name, avatar, flair, description, and status"""
+        #TODO needs some error handling, prevent rate limiting, etc.
+        # TODO if already at target bot, no need to do switch
+        
         # switch bot nickname
         await self.user.edit(username=self.get_name())
         # switch bot avatar

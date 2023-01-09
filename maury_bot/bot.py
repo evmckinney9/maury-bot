@@ -63,8 +63,9 @@ async def on_ready() -> None:
     if config["sync_commands_globally"]:
         print("Syncing commands globally...")
         await bot.tree.sync()
+
     #reset bot persona
-    await bot.discord_refresh_persona()
+    # await bot.discord_refresh_persona()
 
 @tasks.loop(hours=8)
 async def status_task() -> None:
@@ -75,7 +76,7 @@ async def status_task() -> None:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="the sunset"))
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=bot.get_status()))
 
-@tasks.loop(seconds=30)
+@tasks.loop(minutes=30)
 async def bot_activity_level() -> None:
     print("into activity loop")
     if bot.high_activity ==2:
@@ -129,7 +130,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         return
     
     # probability of reacting, banned has 1, otherwise .05
-    react_probability = 1 #0.05
+    react_probability = 0.05
     if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 
