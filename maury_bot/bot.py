@@ -213,6 +213,14 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     #stand by it
     elif any([kwarg == emoji.name for kwarg in ["stand_by_it"]]):
         prompt += "Response: you and the reactor think it's a good idea and are standing by their message.\n"
+
+    # disappointing
+    elif any([kwarg == emoji.name for kwarg in ["disappointing"]]):
+        prompt += "Response: you and the reactor are disappointed by their message, include the phrase 'so no head?'\n"
+    
+    # he_admit_it
+    elif any([kwarg == emoji.name for kwarg in ["he_admit_it"]]):
+        prompt += "Response: the author has admitted to something, now they have to marry their mother-in-law.\n"
     else:
         return
 
