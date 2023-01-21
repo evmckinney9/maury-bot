@@ -44,22 +44,29 @@ class PersonalityHandler():
 
         def prompt_cleaner(self, prompt: str) -> str:
             #personality
-            prompt += f"Write the text message response using personality of: {self.personality}\n"
+            prompt += f"Write your discord message response using personality of: {self.personality}\n"
 
             # small chance they knows their own name
             if random.random() > 0.1:
                 prompt = prompt.replace(f"named {self.name} ", "")
             
-            # only chance to mention current location
+            # larger chance to mention current location 
+            # TODO keep this?, helps with variability
             if random.random() > 0.15:
                 # prompt = prompt.replace(f"at a {self.personality.location} ", "")
                 # use regular expression to remove location, multi-word until next new line
                 prompt = re.sub(r"at a [a-zA-Z ]+\n", ".\n", prompt)
             
-            if self.author is not None:
-                prompt += f"Remember that {self.author.display_name} wrote this message and mention them.\n"
             if self.reactor is not None and self.reactor != self.author:
-                prompt += f"Remember that {self.reactor.display_name} reacted to the message and mention them.\n"
+                # prompt += f"Remember that {self.reactor.display_name} reacted to the message and mention them.\n"
+                prompt += f"You and {self.reactor.display_name} have the same reaction to the message.\n"
+
+            if self.author is not None:
+                # prompt += f"Remember that {self.author.display_name} wrote this message and mention them.\n"
+                prompt += f"{self.author.display_name} wrote the message you are responding to. Be sure to tag them.\n"
+
+            # remove emotes, use re <:emote:1234567890> and replace with emote name
+            prompt = re.sub(r"<:([^:]+):[0-9]+>", r"\1", prompt)
 
             # parsed for tagged user in the original message part of the prompt
             if self.mentions is not None:
@@ -112,8 +119,8 @@ class PersonalityHandler():
                 "n": 1,
                 "stream": False,
                 "logprobs": None,
-                "presence_penalty": .5,
-                "frequency_penalty": .5,
+                "presence_penalty": .25,
+                "frequency_penalty": .25,
             }
 
             # generate a response
