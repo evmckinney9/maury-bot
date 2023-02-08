@@ -97,13 +97,18 @@ async def on_message(message: discord.Message) -> None:
     """
     if message.author == bot.user or message.author.bot:
         return
-    
+
+    # check if message tags @Maury
+    if bot.user.mentioned_in(message):
+        await bot.get_response(context = message.channel, prompt = message.content, author= message.author, mentions= message.mentions)
+        
     #check if message contains meeka blep, then turn on high activity mode
     #TODO could improve this using the discord.Emoji class
-    if "<:blep:847691502867316827>" in message.content:
+    elif "<:blep:847691502867316827>" in message.content:
         bot.high_activity = 2
         bot_activity_level.start()
         await message.add_reaction("<in_there:1038609216014921809>")
+
     await bot.process_commands(message)
 
 @bot.event
@@ -176,7 +181,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
     # prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
 
     # construct the prompt
-    prompt = f"Chat History:\n {message_text}\n"
+    prompt = f"Chat History:\n{message_text}\n"
 
     # condemn, tread lightly
     if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):

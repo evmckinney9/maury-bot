@@ -45,7 +45,7 @@ class Persona(commands.Cog, name="persona"):
         name="chat",
         description="How are you doing today?",
     )
-    
+
     @checks.not_blacklisted()
     async def chat(self, context: Context) -> None:
         """
@@ -54,8 +54,17 @@ class Persona(commands.Cog, name="persona"):
         # get requester
         # await context.defer()
         author = f"{context.author.display_name}"
-        print("who is this", author) #DEBUGGING
-        await self.bot.get_response(context=context, prompt=f"A brief, silly yet foreboding greeting to {author}.\n", author=context.author)
+        # get message contents
+        message = context.message.content
+        # # default prompt
+        # if message == f"/chat":
+        #     prompt = f"A brief, silly yet foreboding greeting to {author}.\n"
+        # else:
+        #     prompt = f"{message}\n"
+        # print(prompt)
+        
+        prompt = f"A brief, silly yet foreboding greeting to {author}.\n"
+        await self.bot.get_response(context=context, prompt=prompt, author=context.author)
 
     @commands.hybrid_command(
         name="switch",
