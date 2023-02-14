@@ -18,6 +18,15 @@ Use `\chat` to get a "Hello, World!" message.
 
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
+#### Experimental Features
+Upload voice messages to `/database`, then use command `/voice_message` to get a random voice message from the database played in voice channel.
+
+I am using https://beta.elevenlabs.io/voice-lab to make recordings of myself and friends trained on our own voices. Then, we could use API to programmaticaly generate voice messages. For now, I am using preloaded voice messages. Later, I will create a voice model custom to our persona using the `Voice Design` feature once it is ready. "Coming February - Design entirely new voices using our generative model". Currently, I am working on passing in a message from plain language, translated into the persona using GPT-3, then finally speaking the voice using Elevenlabs. Reference: https://github.com/elevenlabs/discord-bot
+
+```bash
+sudo apt install ffmpeg
+```
+
 ___
 ## Setup
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
@@ -145,13 +154,4 @@ Also, note that I have added my "banned" emoji to always take precendence over t
     react_probability = 1 #0.05
     if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
-```
-
-
-#### Experimental Features
-Upload voice messages to `/database`, then use command `/voice_message` to get a random voice message from the database played in voice channel.
-
-I am using https://beta.elevenlabs.io/voice-lab to make recordings of myself and friends trained on our own voices. Then, we could use API to programmaticaly generate voice messages. For now, I am using preloaded voice messages. Later, I will create a voice model custom to our persona using the `Voice Design` feature once it is ready. "Coming February - Design entirely new voices using our generative model".
-```bash
-sudo apt install ffmpeg
 ```
