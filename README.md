@@ -27,6 +27,8 @@ I am using https://beta.elevenlabs.io/voice-lab to make recordings of myself and
 sudo apt install ffmpeg
 ```
 
+Until Elevenlabs has developed custom voice models, I need to collect my own voice samples to train a bot. I'll use audacity to isolate the vocals from this youtube video https://www.youtube.com/watch?v=Vxd4Hjun--s
+
 ___
 ## Setup
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
