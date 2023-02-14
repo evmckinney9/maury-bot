@@ -6,6 +6,8 @@ This is a template to create your own discord bot in python.
 Version: 5.4
 """
 
+import asyncio
+import os
 import platform
 import random
 
@@ -53,7 +55,32 @@ class General(commands.Cog, name="general"):
             color=0x9C84EF
         )
         await context.send(embed=embed)
-       
+
+    @commands.hybrid_command(
+        name="voice_message",
+        description="Bot joins call, drops a knowledge bomb"
+    )
+    @checks.not_blacklisted()
+    async def voice_message(self, context: Context) -> None:
+        """
+        Bot joins call, drops a knowledge bomb
+
+        :param context: The hybrid command context.
+        """
+        galley_channel_id = 818370274126069828
+        channel = self.bot.get_channel(galley_channel_id)
+        vc = await channel.connect()
+
+        # # play mp3 and disconnect after
+        # print current directory
+        print(os.getcwd())
+        print(os.listdir())
+        vc.play(discord.FFmpegPCMAudio('maury_bot/database/synthesized_audio.mp3'), after=lambda e: print('done', e))
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+
+    
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     @commands.hybrid_command(
         name="movie",

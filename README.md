@@ -146,3 +146,12 @@ Also, note that I have added my "banned" emoji to always take precendence over t
     if not bot.high_activity and np.random.random() > react_probability and reaction.emoji.name != "banned":
         return
 ```
+
+
+#### Experimental Features
+Upload voice messages to `/database`, then use command `/voice_message` to get a random voice message from the database played in voice channel.
+
+I am using https://beta.elevenlabs.io/voice-lab to make recordings of myself and friends trained on our own voices. Then, we could use API to programmaticaly generate voice messages. For now, I am using preloaded voice messages. Later, I will create a voice model custom to our persona using the `Voice Design` feature once it is ready. "Coming February - Design entirely new voices using our generative model".
+```bash
+sudo apt install ffmpeg
+```
