@@ -20,6 +20,7 @@ from helpers import checks
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from maury_bot.bot import AbstractBot
+from elevenlabs import get_voice_message
 
 
 class General(commands.Cog, name="general"):
@@ -61,7 +62,7 @@ class General(commands.Cog, name="general"):
         description="Bot joins call, drops a knowledge bomb"
     )
     @checks.not_blacklisted()
-    async def voice_message(self, context: Context) -> None:
+    async def voice_message(self, context: Context, message_arg: str) -> None:
         """
         Bot joins call, drops a knowledge bomb
 
@@ -69,18 +70,33 @@ class General(commands.Cog, name="general"):
         """
         galley_channel_id = 818370274126069828
         channel = self.bot.get_channel(galley_channel_id)
-        vc = await channel.connect()
+        # defer
+        await context.defer(ephemeral=True)
 
-        # # play mp3 and disconnect after
-        # print current directory
-        print(os.getcwd())
-        print(os.listdir())
-        vc.play(discord.FFmpegPCMAudio('maury_bot/database/synthesized_audio.mp3'), after=lambda e: print('done', e))
+        # convert message to personality
+        # NOTE context should not matter here, since gets overridden when send_it is False
+        bot_message = await self.bot.get_response(context=channel, prompt= message_arg+'\n', voice_message=True)
+
+        # ret = get_voice_message("Captain Maury", "Hey Kid,... scram!")
+        status, fp = get_voice_message(self.bot.get_name(), bot_message)
+
+        if status == 0:
+            # failed, send message
+            await context.send(fp, ephemeral=True)
+            return
+            # NOTE, optionally could set fp to default instead
+            # fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
+
+        # join vc, play mp3, disconnect
+        vc = await channel.connect()
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
         while vc.is_playing():
             await asyncio.sleep(1)
         await vc.disconnect()
 
-    
+        # reply back to channel with what was spoken
+        await context.send(bot_message, ephemeral=True) 
+
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     @commands.hybrid_command(
         name="movie",

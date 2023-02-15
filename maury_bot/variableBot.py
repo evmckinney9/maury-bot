@@ -43,15 +43,17 @@ class AbstractBot(ABC, Bot):
     # def get_name(self) -> str:
     #     return self.name
     
-    def get_response(self, context: Context, prompt:str, **kwargs)-> str:
+    async def get_response(self, context: Context, prompt:str, **kwargs)-> None:
         """Returns a response from GPT-3
         Optional kwargs:
         author: User
         reactor: User
         mentions: list of Users
+        voice_message: bool, if true, changes to a `translate` prompt and returns text as string instead of sending to channel
+        (set to false to immediately send the response to the channel)
         """
         handler = self.get_handler()
-        return handler.respond(context, prompt, **kwargs)
+        return await handler.respond(context, prompt, **kwargs)
     
     # def get_personality(self) -> str:
     #     raise NotImplementedError

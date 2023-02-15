@@ -16,10 +16,20 @@ class PersonalityHandler():
         self.personality = persona.get_personality()
         self.name = persona.get_name()
     
-    def respond(self, context:Context, prompt:str, **kwargs) -> str:
-        """Returns a response from GPT-3"""
-        messager = self.MessageHandler(self, context, prompt, **kwargs)
-        return messager.bot_response()
+    async def respond(self, context:Context, prompt:str, voice_message=False, **kwargs) -> str:
+        """Returns a response from GPT-3
+        params:
+            voice_message: bool, if true, changes to a `translate` prompt and returns text as string instead of sending to channel
+            (set to false to immediately send the response to the channel)
+        """
+        if not voice_message:
+            messager = self.MessageHandler(self, context, prompt, **kwargs)
+            response_text = await messager.bot_response()
+            await context.send(response_text)
+        else:
+            messager = self.MessageHandler(self, 0, prompt, **kwargs)
+            response_text = await messager.bot_response()
+        return response_text
     
     class MessageHandler():
         def __init__(self, personaHandler: PersonalityHandler, context:Context, prompt:str, **kwargs):
@@ -32,19 +42,32 @@ class PersonalityHandler():
             self.author: User = kwargs.get("author", None)
             self.reactor: User = kwargs.get("reactor", None)
             self.mentions = kwargs.get("mentions", None)
-            
+
         async def bot_response(self):
             """Create and respond to the prompt with a message to the channel"""
-            async with self.context.typing():
-                prompt = self.prompt_cleaner(self.prompt)
+            if self.context != 0: # 0 is our signal dummy variable
+                async with self.context.typing():
+                    prompt = self.prompt_cleaner(self.prompt)
+                    print(prompt)
+                    ret = self.chatgpt3(prompt)
+                    response_text = self.response_cleaner(ret)
+                    return response_text
+
+            else: # if context == 0, don't wrap in async typing
+                # XXX assuming this case is only true for voice messages
+                assert self.context == 0
+                prompt = self.prompt_cleaner(self.prompt, reprhase=True)
                 print(prompt)
                 ret = self.chatgpt3(prompt)
                 response_text = self.response_cleaner(ret)
-                await self.context.send(response_text)
+                return response_text
 
-        def prompt_cleaner(self, prompt: str) -> str:
-            #personality
-            prompt += f"Write your discord message response using personality of: {self.personality}\n"
+        def prompt_cleaner(self, prompt: str, reprhase=False) -> str:
+            if not reprhase:
+                #personality
+                prompt += f"Write your discord message response using personality of: {self.personality}\n"
+            else:
+                prompt += f"Rephrase this message into the voice of: {self.personality}\n"
 
             # small chance they knows their own name
             if random.random() > 0.1:

@@ -100,7 +100,7 @@ async def on_message(message: discord.Message) -> None:
 
     # check if message tags @Maury
     if bot.user.mentioned_in(message):
-        await bot.get_response(context = message.channel, prompt = message.content, author= message.author, mentions= message.mentions)
+        await bot.get_response(context = message.channel, prompt = message.content+'\n', author= message.author, mentions= message.mentions)
         
     #check if message contains meeka blep, then turn on high activity mode
     #TODO could improve this using the discord.Emoji class
