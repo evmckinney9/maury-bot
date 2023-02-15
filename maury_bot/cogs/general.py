@@ -71,7 +71,7 @@ class General(commands.Cog, name="general"):
         galley_channel_id = 818370274126069828
         channel = self.bot.get_channel(galley_channel_id)
         # defer
-        await context.defer(ephemeral=True)
+        await context.defer(ephemeral=False)
 
         # convert message to personality
         # NOTE context should not matter here, since gets overridden when send_it is False
@@ -95,7 +95,7 @@ class General(commands.Cog, name="general"):
         await vc.disconnect()
 
         # reply back to channel with what was spoken
-        await context.send(bot_message, ephemeral=True) 
+        await context.send(bot_message, ephemeral=False) 
 
     # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
     @commands.hybrid_command(
