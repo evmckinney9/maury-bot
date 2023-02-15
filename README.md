@@ -19,16 +19,13 @@ Use `\chat` to get a "Hello, World!" message.
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
 #### Experimental Features
-Upload voice messages to `/database`, then use command `/voice_message` to get a random voice message from the database played in voice channel.
-
-I am using https://beta.elevenlabs.io/voice-lab to make recordings of myself and friends trained on our own voices. Then, we could use API to programmaticaly generate voice messages. For now, I am using preloaded voice messages. Later, I will create a voice model custom to our persona using the `Voice Design` feature once it is ready. "Coming February - Design entirely new voices using our generative model". Currently, I am working on passing in a message from plain language, translated into the persona using GPT-3, then finally speaking the voice using Elevenlabs. Reference: https://github.com/elevenlabs/discord-bot
+Use command `/voice_message` to get a voice message into the voice channel.
+Trained using: https://www.youtube.com/watch?v=E-SNQo9STps
+Reference: https://github.com/elevenlabs/discord-bot
 
 ```bash
 sudo apt install ffmpeg
 ```
-
-Until Elevenlabs has developed custom voice models, I need to collect my own voice samples to train a bot. I'll use audacity to isolate the vocals from this youtube video https://www.youtube.com/watch?v=Vxd4Hjun--s
-
 ___
 ## Setup
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
