@@ -17,6 +17,7 @@
 
 import requests
 import json
+import random
 
 def get_voice_message(bot_name, message_text):
     """
@@ -32,7 +33,7 @@ def get_voice_message(bot_name, message_text):
     url = "https://api.elevenlabs.io/v1/"
 
     if len(message_text) > 1000:
-        return "Message too long, max 1000 characters"
+        return (0, "Message too long, max 1000 characters")
 
     # get api key from config.json
     with open("config.json") as file:
@@ -48,7 +49,7 @@ def get_voice_message(bot_name, message_text):
     response = requests.get(url + "voices", headers=headers)
 
     if response.status_code != 200:
-        return (0, "Request failed with status code:", response.status_code)
+        return (0, f"Request failed with status code: {response.status_code}")
     
     # get voice id that matches bot_name
     voice_id = None
@@ -57,14 +58,19 @@ def get_voice_message(bot_name, message_text):
             voice_id = voice["voice_id"]
             break
     if voice_id == None:
-        return (0, "No voice found for bot_name:", bot_name)
+        # XXX temporary override, randomly select a voice
+        # voice_id = response.json()['voices'][0]["voice_id"]
+        random_voice = random.choice(response.json()['voices'])
+        voice_id = random_voice["voice_id"]
+        # return (0, f"No voice found for bot_name: {bot_name}")
     
     # send request to convert text to speech
     print("Sending request to convert text to speech...")
     response = requests.post(url + "text-to-speech/" + voice_id, json={"text": message_text}, headers=headers)
     
     if response.status_code != 200:
-        return (0, "Request failed with status code:", response.status_code)
+        print(response.text)
+        return (0, f"Request failed with status code: {response.status_code}")
     
     # write out audio file
     # NOTE, if we wanted, we could save to a unique file name and return that

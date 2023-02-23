@@ -113,7 +113,7 @@ class General(commands.Cog, name="general"):
             if status == 0:
                 # failed, send message
                 await context.send(fp, ephemeral=True)
-                self.bot.voice_message_mutex.release()
+                # self.bot.voice_message_mutex.release() # don't use, will still execute finally
                 return
                 # NOTE, optionally could set fp to default instead
                 # fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
