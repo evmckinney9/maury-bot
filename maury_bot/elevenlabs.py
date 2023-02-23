@@ -62,6 +62,8 @@ def get_voice_message(bot_name, message_text):
         # voice_id = response.json()['voices'][0]["voice_id"]
         random_voice = random.choice(response.json()['voices'])
         voice_id = random_voice["voice_id"]
+        # change voice's default settings
+        requests.post(url+ "voices/"+ voice_id + "/settings/edit", json={"stability": 0.12, "similarity_boost": 0.88}, headers=headers)
         # return (0, f"No voice found for bot_name: {bot_name}")
     
     # send request to convert text to speech

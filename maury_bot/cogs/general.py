@@ -101,9 +101,14 @@ class General(commands.Cog, name="general"):
         self.bot.voice_message_mutex.acquire()
         
         try:
-            # convert message to personality
-            # NOTE context should not matter here, since gets overridden when send_it is False
-            bot_message = await self.bot.get_response(context=channel, prompt= message_arg+'\n', voice_message=True)
+            # if message_arg in qoutes, then use that exactly as the message
+            # otherwise, use the message as a prompt to the bot
+            if message_arg[0] == '"' and message_arg[-1] == '"':
+                bot_message = message_arg[1:-1]
+            else:
+                # convert message to personality
+                # NOTE context should not matter here, since gets overridden when send_it is False
+                bot_message = await self.bot.get_response(context=channel, prompt= message_arg+'\n', voice_message=True)
             self.bot.voice_message = bot_message
 
             # ret = get_voice_message("Captain Maury", "Hey Kid,... scram!")
