@@ -20,6 +20,7 @@ Use command `/speak` to get a voice message into the voice channel.
 
 
 Trained using: https://www.youtube.com/watch?v=E-SNQo9STps
+
 Reference: https://github.com/elevenlabs/discord-bot
 
 ```bash
