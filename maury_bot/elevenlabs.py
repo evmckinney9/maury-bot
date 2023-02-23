@@ -73,4 +73,8 @@ def get_voice_message(bot_name, message_text):
     with open(audiofilename, 'wb') as out:
         out.write(response.content)
 
+    # finally, check current API usage
+    # response = requests.get(url + "user/subscription", headers=headers)
+    # # TODO
+
     return (1, audiofilename)
