@@ -2,24 +2,23 @@
 
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
-Automated content moderation reminders on your behalf, on :angry: emote
-![image](https://user-images.githubusercontent.com/47376937/209484678-ec09fce5-26b3-4213-a16d-3e8f4e4d3d25.png)
+Reactions on your server's custom emotes.
 
-Send a kind regards, on :joy: emote,
-![image](https://user-images.githubusercontent.com/47376937/209484703-03a706dc-a751-4d1a-a3ca-8d4f6d2d5cdb.png)
+![image](https://user-images.githubusercontent.com/47376937/220812786-5a8883fc-efd3-4db9-a1c7-64bf2f30c772.png)
 
-or a sincere condolence, on :cry: emote.
-![image](https://user-images.githubusercontent.com/47376937/209484689-79ec9c9b-e990-47fd-b96b-6fc10a0138c0.png)
+Tag @bot to respond to any message:
 
-and of course your server's custom emotes.
-![image](https://user-images.githubusercontent.com/47376937/209485945-fc012e33-9eb9-4174-9bf8-5b253630b8ad.png)
+![image](https://user-images.githubusercontent.com/47376937/220812662-8d0e33ed-cc7f-47cb-80ae-c2c0ab96b161.png)
 
-Use `\chat` to get a "Hello, World!" message.
+Use `/chat` to get a "Hello, World!" message.
 
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
-#### Experimental Features
-Use command `/voice_message` to get a voice message into the voice channel.
+Use command `/speak` to get a voice message into the voice channel.
+
+![image](https://user-images.githubusercontent.com/47376937/220812870-945ef997-53c3-4872-b546-209be9595563.png)
+
+
 Trained using: https://www.youtube.com/watch?v=E-SNQo9STps
 Reference: https://github.com/elevenlabs/discord-bot
 
