@@ -64,21 +64,22 @@ class General(commands.Cog, name="general"):
     )
     @checks.not_blacklisted()
     async def repeat(self, context: Context) -> None:
+        galley_channel_id = 818370274126069828
+        channel = self.bot.get_channel(galley_channel_id)
+        await context.defer(ephemeral=False)
         try:
-            galley_channel_id = 818370274126069828
-            channel = self.bot.get_channel(galley_channel_id)
-            context.defer(ephemeral=False)
-            # join vc, play mp3, disconnect
-            vc = await channel.connect()
-            vc.play(discord.FFmpegPCMAudio(self.bot.voice_file_path)) #, after=lambda e: print('done', e))
-            while vc.is_playing():
-                await asyncio.sleep(1)
-            await vc.disconnect()
-
-            # reply back to channel with what was spoken
-            await context.send(self.bot.voice_message, ephemeral=False) 
+            fp = self.bot.voice_file_path
+            message = self.bot.voice_message
         except:
-            await context.send("I haven't said anything yet!", ephemeral=True)
+            fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
+            message = "I don't have anything to repeat"
+        # try default audio
+        vc = await channel.connect()
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+        await context.send(message, ephemeral=False)
 
     @commands.hybrid_command(
         name="speak",
