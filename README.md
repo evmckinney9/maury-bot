@@ -1,5 +1,7 @@
 ## Python Discord Bot with GPT-3 Integration
 
+#### I am currently working on rewriting to be compatible with GPT-3.5+, with many more features!
+___
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
 Reactions on your server's custom emotes.
