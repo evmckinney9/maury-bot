@@ -1,5 +1,5 @@
 from datetime import timedelta
-async def construct_chat_history(bot, channel, reaction=None):
+async def construct_chat_history(bot, channel, reaction=None, mentions=None):
     """
     Builds chat history to pass as context to the model
     Optionally, which acts like a stopping point (look from current to past up to reacted message)
@@ -21,7 +21,7 @@ async def construct_chat_history(bot, channel, reaction=None):
     # message_json = [{"role": m.author.display_name, "content": m.content} for m in message_list]
     # if bot is the author, then role is "assistant"
     # prepend discord display name to all messages from bot and user
-    message_json = [{"role": "assistant" if m.author == bot.user else m.author.display_name, "content": m.author.display_name + ": " + m.content} for m in message_list]
+    message_json = [{"role": "assistant" if m.author == bot.user else "user", "content": m.author.display_name + ": " + m.content} for m in message_list]
 
     # DEPRECATE, in GPT3.5+, should be able to identify itself in context
     # # Then, if there exists a message in the cache, remove all messages before it
@@ -35,6 +35,8 @@ async def construct_chat_history(bot, channel, reaction=None):
     #     message_list = message_list[message_list.index(next(m for m in message_list if m.author == bot.user)):]
     
     # finally all mentions need to be passed along for string building later
+    if mentions is None:
+        mentions = [] # initialize if not passed in
     mentions.extend([mention for message in message_list for mention in message.mentions]) #XXX unreadable garbage
     mentions = list(set(mentions)) # remove duplicates
     return message_json, mentions

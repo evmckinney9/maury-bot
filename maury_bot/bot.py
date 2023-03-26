@@ -139,7 +139,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         if np.random.random() > react_probability:
             return
     
-    message_list, mentions = await bot_chat.construct_chat_history(bot, channel, reaction=reaction)
+    message_list, mentions = await bot_chat.construct_chat_history(bot, channel, reaction=reaction, mentions=mentions)
 
     from maury_bot.bot.bot_chat import get_emote_response
     prompt = get_emote_response(emoji.name, author)

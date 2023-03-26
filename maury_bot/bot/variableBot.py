@@ -7,7 +7,6 @@ from discord.ext.commands import Bot, Context
 from discord import Intents
 import discord
 from functools import partial
-
 """	
 Setup bot intents (events restrictions)
 For more information about intents, please go to the following websites:
@@ -55,7 +54,7 @@ class AbstractBot(ABC, Bot):
         (set to false to immediately send the response to the channel)
         """
         handler = self.get_handler()
-        return await handler.respond(context, message_list **kwargs)
+        return await handler.respond(context, message_list, **kwargs)
     
     # def get_personality(self) -> str:
     #     raise NotImplementedError
@@ -68,7 +67,7 @@ class VariablePersonaBot(AbstractBot):
         
         # sets the default persona to DaemonMax
         if persona is None:
-            from botPopulation import MauryBot, DottyBot, DaemonMax
+            from maury_bot.bot.botPopulation import MauryBot, DottyBot, DaemonMax
             persona = MauryBot()
             # persona = DaemonMax()
 
@@ -84,7 +83,7 @@ class VariablePersonaBot(AbstractBot):
         super().__init__()
 
     def switch_to(self, bot: AbstractBotPersonality=None):
-        from botPopulation import MauryBot, DottyBot, DaemonMax
+        from maury_bot.bot.botPopulation import MauryBot, DottyBot, DaemonMax
 
         """Switches the current bot to the given bot"""
         if bot is None and isinstance(self.current_bot, MauryBot):
