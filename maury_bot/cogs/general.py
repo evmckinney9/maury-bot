@@ -20,10 +20,18 @@ from helpers import checks
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from maury_bot.bot import AbstractBot
-from elevenlabs import get_voice_message
+from maury_bot.helpers.elevenlabs import get_voice_message
 from threading import Thread, Lock
 
 class General(commands.Cog, name="general"):
+    """
+    List of commands:
+        - Help
+        - Ping
+        - Speak
+        - Repeat
+        - not crazy ;)
+    """
     def __init__(self, bot: "AbstractBot"):
         self.bot = bot
         self.bot.voice_message_mutex = Lock()
@@ -57,30 +65,7 @@ class General(commands.Cog, name="general"):
             color=0x9C84EF
         )
         await context.send(embed=embed)
-    
-    @commands.hybrid_command(
-        name="repeat",
-        description="Bot joins call, repeats last thing it said"
-    )
-    @checks.not_blacklisted()
-    async def repeat(self, context: Context) -> None:
-        galley_channel_id = 818370274126069828
-        channel = self.bot.get_channel(galley_channel_id)
-        await context.defer(ephemeral=False)
-        try:
-            fp = self.bot.voice_file_path
-            message = self.bot.voice_message
-        except:
-            fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
-            message = "I don't have anything to repeat"
-        # try default audio
-        vc = await channel.connect()
-        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
-        while vc.is_playing():
-            await asyncio.sleep(1)
-        await vc.disconnect()
-        await context.send(message, ephemeral=False)
-
+ 
     @commands.hybrid_command(
         name="speak",
         description="Bot joins call, drops a knowledge bomb"
@@ -135,28 +120,74 @@ class General(commands.Cog, name="general"):
 
         finally:
             self.bot.voice_message_mutex.release()
-
-    # Here you can just add your own commands, you'll always need to provide "self" as first parameter.
+       
     @commands.hybrid_command(
-        name="movie",
-        # description=f"Hey {self.bot.name}, What movie should I watch?",
-        description="What movie should I watch?",
+        name="repeat",
+        description="Bot joins call, repeats last thing it said"
     )
     @checks.not_blacklisted()
-    async def movie(self, context: Context) -> None:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://script.google.com/macros/s/AKfycbygn4fG-jiZqmIrqmiSDyzy8cOjeXDHUPAhA5OHVqLPW0WQLhn172dU3b-K5T2eg8pVPw/exec") as request:
-                if request.status == 200:
-                    spreadsheet_data = await request.json()
-                    movie_str = spreadsheet_data["movie"]
-                    await self.bot.get_response(context=context, prompt=f"Response: a recommendation for the movie {movie_str}.\n")
-                else:
-                    embed = discord.Embed(
-                        title="Error!",
-                        description="There is something wrong with the API, please try again later",
-                        color=0xE02B2B
-                    )
-                    await context.send(embed=embed)
+    async def repeat(self, context: Context) -> None:
+        galley_channel_id = 818370274126069828
+        channel = self.bot.get_channel(galley_channel_id)
+        await context.defer(ephemeral=False)
+        try:
+            fp = self.bot.voice_file_path
+            message = self.bot.voice_message
+        except:
+            fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
+            message = "I don't have anything to repeat"
+        # try default audio
+        vc = await channel.connect()
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+        await context.send(message, ephemeral=False)
+
+    @commands.hybrid_command(
+        name="not_crazy",
+        description="blah",
+    )
+    @checks.not_blacklisted()
+    async def not_crazy(self, context: Context) -> None:
+        # join VC and play the default audio
+        galley_channel_id = 818370274126069828
+        channel = self.bot.get_channel(galley_channel_id)
+        await context.defer(ephemeral=False)
+        vc = await channel.connect()
+
+        # define some random chance
+        p = 0.1
+        if random.random() < p:
+            # play default audio
+            fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
+            vc.play(discord.FFmpegPCMAudio(fp))
+
+        else:
+            k = 3 # number of ellipses
+            #"I uhhhh, ... am NOT crazy!"
+            prompt = "I uhhhh, "
+            for i in range(k):
+                prompt += "... "
+            prompt += "am NOT crazy!"
+
+            # get response
+            # ret = get_voice_message("Captain Maury", "Hey Kid,... scram!")
+            status, fp = get_voice_message(self.bot.get_name(), prompt)
+            self.bot.voice_file_path = fp
+
+            if status == 0:
+                # failed, send message
+                await context.send(fp, ephemeral=True)
+                # self.bot.voice_message_mutex.release() # don't use, will still execute finally
+                return
+            
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+        while vc.is_playing():
+            await asyncio.sleep(1)
+        await vc.disconnect()
+        await context.send("I'm not crazy, you're crazy!", ephemeral=False)
+
 
 async def setup(bot):
     await bot.add_cog(General(bot))

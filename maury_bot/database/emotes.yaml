@@ -1,0 +1,72 @@
+emotes:
+  - name: condemnation
+    emojis:
+      - judgement
+      - flip_off
+      - banned
+    prompt: "Response: a condemnation of the message from {author}.\n"
+  - name: inappropriate
+    emojis:
+      - inappropriate
+    prompt: "Response: the message from {author} is inappropriate.\n"
+  - name: congratulations
+    emojis:
+      - flawless_victory
+      - ole
+      - pog
+    prompt: "Response: congratulations to the message from {author}.\n"
+  - name: excited
+    emojis:
+      - sheeee
+    prompt: "Response: excited by the message from {author}.\n"
+  - name: condolences
+    emojis:
+      - antisheeee
+      - low_energy
+    prompt: "Response: send condolences to {author}.\n"
+  - name: good_answer
+    emojis:
+      - good_answer
+    prompt: "Response: you like what {author} said, and that it was particularly clever.\n"
+  - name: caught
+    emojis:
+      - caught
+      - cap
+    prompt: "Response: {author} has been caught in a lie.\n"
+  - name: drool
+    emojis:
+      - drool
+    prompt: "Response: you are drooling over {author}'s message.\n"
+  - name: suspicious
+    emojis:
+      - sus
+      - terio
+    prompt: "Response: {author} is acting suspicious.\n"
+  - name: shock
+    emojis:
+      - shock
+    prompt: "Response: you are shocked by {author}'s message.\n"
+  - name: lul
+    emojis:
+      - lul
+    prompt: "Response: you are laughing {author}'s message.\n"
+  - name: joy
+    emojis:
+      - joy
+    prompt: "Response: {author}'s message makes you happy.\n"
+  - name: facepalm
+    emojis:
+      - facepalm
+    prompt: "Response: you are facepalming at {author}'s message.\n"
+  - name: disappointing
+    emojis:
+      - disappointing
+    prompt: "Response: you are disappointed about {author}'s message.\n"
+  - name: stand_by_it
+    emojis:
+      - stand_by_it
+    prompt: "Response: despite facing criticisms, you support {author} with their good idea.\n"
+  - name: he_admit_it
+    emojis:
+      - he_admit_it
+    prompt: "Response: An epic turn of events, {author} has to marry their mother-in-law!\n"

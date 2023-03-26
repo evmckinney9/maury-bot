@@ -1,8 +1,5 @@
 """
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
-Description:
-This is a template to create your own discord bot in python.
-
 Version: 5.4
 """
 
@@ -18,10 +15,10 @@ import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
-from datetime import timedelta
-from maury_bot.variableBot import VariablePersonaBot 
+from maury_bot.bot.variableBot import VariablePersonaBot 
 import exceptions
 from maury_bot.cogs.persona import Persona
+from maury_bot.bot import bot_chat
 
 
 
@@ -88,6 +85,7 @@ async def bot_activity_level() -> None:
         bot_activity_level.stop()
         bot.high_activity = 0
 
+
 @bot.event
 async def on_message(message: discord.Message) -> None:
     """
@@ -100,7 +98,9 @@ async def on_message(message: discord.Message) -> None:
 
     # check if message tags @Maury
     if bot.user.mentioned_in(message):
-        await bot.get_response(context = message.channel, prompt = message.content+'\n', author= message.author, mentions= message.mentions)
+        # get chat history
+        message_list, mentions = await bot_chat.construct_chat_history(bot, message.channel)
+        await bot.get_response(context = message.channel, message_list = message_list, author= message.author, mentions= mentions)
         
     #check if message contains meeka blep, then turn on high activity mode
     #TODO could improve this using the discord.Emoji class
@@ -115,7 +115,6 @@ async def on_message(message: discord.Message) -> None:
 async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> None:
     """When a custom emoji is added to text, have a variable probability chance of Maury responding according to the message being reacted to"""
     emoji = reaction.emoji
-    reactor = user.display_name
     message_text = reaction.message.content
     author = reaction.message.author.display_name
     channel = reaction.message.channel
@@ -139,129 +138,14 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         react_probability = 0.05
         if np.random.random() > react_probability:
             return
-
-    async def construct_chat_history(channel, mentions):
-        """
-        Builds chat history to pass as context to the model
-        Rules for history, max 25 messages, -60 seconds, stop if hit a message in responded_to cache
-        """
-        # First, get the last 25 messages, -60 seconds from the message being reacted to
-        message_list = [m async for m in channel.history(limit=25, after=reaction.message.created_at + timedelta(seconds=-60))]
-        
-        # We could filter by author here, but I think it's better to include all authors
-        # message_list = filter(lambda m: m.author == reaction.message.author, message_list)
-        
-        # Next, sort by time 
-        message_list = sorted(message_list, key=lambda m: m.created_at)
-        
-        # Then, if there exists a message in the cache, remove all messages before it
-        # this is to separate context of a message from any other that has already been responded to'
-        if any([m.id in bot.responded_to_messages for m in message_list]):
-            #TODO test this
-            message_list = message_list[message_list.index(next(m for m in message_list if m.id in bot.responded_to_messages)):]
-        
-        # NOTE, messages from the bot itself should also count as stopping points
-        if any([m.author == bot.user for m in message_list]):
-            message_list = message_list[message_list.index(next(m for m in message_list if m.author == bot.user)):]
-
-        # Finally, construct the message text
-        # use format Author: message \n
-        message_text = "\n".join([f"{m.author.display_name}: {m.content}" for m in message_list])
-        # finish with a newline for good measure :)
-        message_text += "\n"
-        
-        # Second functionality, any mentions in the message need to be passed along to be parsed out later
-        mentions.extend([mention for message in message_list for mention in message.mentions]) #XXX unreadable garbage
-        mentions = list(set(mentions)) # remove duplicates
-        return message_text, mentions
     
-    message_text, mentions = await construct_chat_history(channel, mentions)
+    message_list, mentions = await bot_chat.construct_chat_history(bot, channel, reaction=reaction)
 
-    # deprecated because of the new construct_chat_history function
-    # prompt = f"Message: {message_text}\nAuthor: {author}\nReacted by: {reactor}\n"
-
-    # construct the prompt
-    prompt = f"Chat History:\n{message_text}\n"
-
-    # condemn, tread lightly
-    if any([kwarg == emoji.name for kwarg in ["judgement", "flip_off", "banned"]]):
-        prompt += f"Response: a condemnation of the message from the {author}.\n"
-    
-    # inappropriate
-    elif any([kwarg == emoji.name for kwarg in ["inappropriate"]]):
-        prompt += f"Response: the message from the {author} is inappropriate.\n"
-    
-    #say congratulations
-    elif any([kwarg == emoji.name for kwarg in ["flawless_victory", "ole", "pog"]]):
-        prompt += f"Response: congratulations to the message from the {author}.\n"
-
-    elif any([kwarg == emoji.name for kwarg in ["sheeee"]]):
-        prompt += f"Response: exicted by the message from the {author}.\n"
-
-    # condolences
-    elif any([kwarg == emoji.name for kwarg in ["antisheeee", "low_energy"]]):
-        prompt += f"Response: send condolences to {author}.\n"
-    
-    #good answer
-    elif any([kwarg == emoji.name for kwarg in ["good_answer"]]):
-        prompt += f"Response: you like what {author} said, and that it was particularly clever.\n"
-    
-    # caught
-    elif any([kwarg == emoji.name for kwarg in ["caught", "cap"]]):
-        prompt += f"Response: {author} has been caught in a lie.\n"
-    
-    # drool
-    elif any([kwarg == emoji.name for kwarg in ["drool"]]):
-        prompt += f"Response: you are drooling over {author}'s message.\n"
-    
-    # sus
-    elif any([kwarg == emoji.name for kwarg in ["sus", "terio"]]):
-        prompt += f"Response: {author} is acting suspicious.\n"
-    
-    # shock
-    elif any([kwarg == emoji.name for kwarg in ["shock"]]):
-        prompt += f"Response: you are shocked by {author}'s message.\n"
-
-    # lul
-    elif any([kwarg == emoji.name for kwarg in ["lul"]]):
-        prompt += f"Response: you are laughing {author}'s message.\n"
-    
-    #joy
-    elif any([kwarg == emoji.name for kwarg in ["joy"]]):
-        prompt += f"Response: {author}'s message makes you happy.\n"
-
-    #facepalm
-    elif any([kwarg == emoji.name for kwarg in ["facepalm"]]):
-        prompt += f"Response: you are facepalming at {author}'s message.\n"
-
-    #disappointing
-    elif any([kwarg == emoji.name for kwarg in ["disappointing"]]):
-        prompt += f"Response: you disappointed by {author}'s bad news.\n"
-    
-    #stand by it
-    elif any([kwarg == emoji.name for kwarg in ["stand_by_it"]]):
-        prompt += f"Response: despite facing criticsms, you support {author} with their good idea.\n"
-
-    # disappointing
-    elif any([kwarg == emoji.name for kwarg in ["disappointing"]]):
-        prompt += f"Response: you are disappointed about {author}'s message'\n"
-    
-    # he_admit_it
-    elif any([kwarg == emoji.name for kwarg in ["he_admit_it"]]):
-        prompt += f"Response: An epic turn of events, {author} has to marry their mother-in-law!\n"
-    else:
+    from maury_bot.bot.bot_chat import get_emote_response
+    prompt = get_emote_response(emoji.name, author)
+    if not prompt:
         return
-
-    # XXX I believe this is deprecated because of new prompt construction
-    # # if the author and reactor are the same person
-    # if author == reactor:
-    #     #NOTE order matters
-    #     prompt = prompt.replace("you and the reactor are both", "you are")
-    #     prompt = prompt.replace("you and the reactor have both", "you have")
-    #     prompt = prompt.replace("you and the reactor", "you")
-    #     prompt = prompt.replace("yourself and the reactor", "yourself")
-
-
+    
     # add message to cache to avoid double responding
     bot.responded_to_messages.append(reaction.message.id)
 
@@ -270,7 +154,7 @@ async def on_reaction_add(reaction: discord.Reaction, user: discord.User) -> Non
         bot.responded_to_messages.pop(0)
 
     # send message
-    await bot.get_response(context = channel, prompt = prompt, author= reaction.message.author, reactor=user, mentions= mentions)
+    await bot.get_response(context = channel, prompt = prompt, message_list = message_list, author= reaction.message.author, reactor=user, mentions= mentions)
     
     # mark message as responded to by adding a reaction
     await reaction.message.add_reaction(reaction.emoji)

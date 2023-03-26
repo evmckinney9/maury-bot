@@ -1,6 +1,7 @@
 # create abstract class for personalities
 from abc import ABC
-from maury_bot.chatgpt3 import PersonalityHandler
+from typing import List
+from maury_bot.helpers.chatgpt import PersonalityHandler
 import random
 from discord.ext.commands import Bot, Context
 from discord import Intents
@@ -43,9 +44,10 @@ class AbstractBot(ABC, Bot):
     # def get_name(self) -> str:
     #     return self.name
     
-    async def get_response(self, context: Context, prompt:str, **kwargs)-> None:
+    async def get_response(self, context: Context, message_list:List[str], **kwargs)-> None:
         """Returns a response from GPT-3
         Optional kwargs:
+        prompt: str, GPT system prompt (says how to behave/what to do/respond with certain emotion/etc)
         author: User
         reactor: User
         mentions: list of Users
@@ -53,7 +55,7 @@ class AbstractBot(ABC, Bot):
         (set to false to immediately send the response to the channel)
         """
         handler = self.get_handler()
-        return await handler.respond(context, prompt, **kwargs)
+        return await handler.respond(context, message_list **kwargs)
     
     # def get_personality(self) -> str:
     #     raise NotImplementedError
@@ -66,7 +68,7 @@ class VariablePersonaBot(AbstractBot):
         
         # sets the default persona to DaemonMax
         if persona is None:
-            from maury_bot.botPopulation import MauryBot, DottyBot, DaemonMax
+            from botPopulation import MauryBot, DottyBot, DaemonMax
             persona = MauryBot()
             # persona = DaemonMax()
 
@@ -82,7 +84,7 @@ class VariablePersonaBot(AbstractBot):
         super().__init__()
 
     def switch_to(self, bot: AbstractBotPersonality=None):
-        from maury_bot.botPopulation import MauryBot, DottyBot, DaemonMax
+        from botPopulation import MauryBot, DottyBot, DaemonMax
 
         """Switches the current bot to the given bot"""
         if bot is None and isinstance(self.current_bot, MauryBot):
