@@ -12,6 +12,11 @@ Tag @bot to respond to any message:
 
 ![image](https://user-images.githubusercontent.com/47376937/220812662-8d0e33ed-cc7f-47cb-80ae-c2c0ab96b161.png)
 
+Responds with the server's emotes:
+
+![image](https://user-images.githubusercontent.com/47376937/227757680-3d21122b-b850-45ef-88b5-6c242408cd86.png)
+
+
 Use `/chat` to get a "Hello, World!" message.
 
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
