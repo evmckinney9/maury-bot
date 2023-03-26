@@ -7,49 +7,56 @@ from discord import User
 import random
 import re
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
-    from maury_bot.variableBot import Persona
+    from maury_bot.bot.variableBot import Persona
 
 class PersonalityHandler():
     def __init__(self, persona: Persona):
         self.personality = persona.get_personality()
         self.name = persona.get_name()
     
-    async def respond(self, context:Context, prompt:str, voice_message=False, **kwargs) -> str:
+    async def respond(self, context:Context, message_list:List[str], voice_message=False, **kwargs) -> str:
         """Returns a response from GPT-3
         params:
             voice_message: bool, if true, changes to a `translate` prompt and returns text as string instead of sending to channel
             (set to false to immediately send the response to the channel)
         """
         if not voice_message:
-            messager = self.MessageHandler(self, context, prompt, **kwargs)
+            messager = self.MessageHandler(self, context, message_list, **kwargs)
             response_text = await messager.bot_response()
             await context.send(response_text)
         else:
-            messager = self.MessageHandler(self, 0, prompt, **kwargs)
+            messager = self.MessageHandler(self, 0, message_list, **kwargs)
             response_text = await messager.bot_response()
         return response_text
     
     class MessageHandler():
-        def __init__(self, personaHandler: PersonalityHandler, context:Context, prompt:str, **kwargs):
+        def __init__(self, personaHandler: PersonalityHandler, context:Context, message_list:List[str], **kwargs):
             self.personality = personaHandler.personality
             self.name = personaHandler.name
             self.context = context
-            self.prompt = prompt
-            if self.context is None or self.prompt is None:
-                raise ValueError("missing context and/or prompt")
+            self.message_list = message_list
+            if self.context is None:
+                raise ValueError("missing context")
+            if self.message_list is None:
+                # give warning, might gpt might not go first
+                # NOTE needs debug, if this case breaks, just give message_list 
+                # something default, like "hello" from user (?)
+                print("WARNING: message_list is None")
+
+            self.prompt = kwargs.get("prompt", None)
             self.author: User = kwargs.get("author", None)
             self.reactor: User = kwargs.get("reactor", None)
             self.mentions = kwargs.get("mentions", None)
 
         async def bot_response(self):
             """Create and respond to the prompt with a message to the channel"""
-            if self.context != 0: # 0 is our signal dummy variable
+            if self.context != 0: # 0 indicates voice message, mean's we don't want to wrap in async typing
                 async with self.context.typing():
-                    prompt = self.prompt_cleaner(self.prompt)
-                    print(prompt)
-                    ret = self.chatgpt3(prompt)
+                    self.prompt_cleaner(self.prompt)
+                    print(self.prompt)
+                    ret = self.chatgpt()
                     response_text = self.response_cleaner(ret)
                     return response_text
 
@@ -58,7 +65,7 @@ class PersonalityHandler():
                 assert self.context == 0
                 prompt = self.prompt_cleaner(self.prompt, reprhase=True)
                 print(prompt)
-                ret = self.chatgpt3(prompt)
+                ret = self.chatgpt(prompt)
                 response_text = self.response_cleaner(ret)
                 return response_text
 
@@ -96,7 +103,7 @@ class PersonalityHandler():
                 for user in self.mentions:
                     prompt = prompt.replace(f"<@{user.id}>", user.display_name)
             
-            return prompt
+            self.prompt = prompt
 
         def response_cleaner(self, message: str) -> str:
             """Cleans the response from GPT-3"""
@@ -124,7 +131,7 @@ class PersonalityHandler():
 
             return message
 
-        def chatgpt3(self, prompt: str) -> str:
+        def chatgpt(self) -> str:
             """Returns a response from GPT-3"""
 
             # get api key from config.json
@@ -134,8 +141,9 @@ class PersonalityHandler():
 
             # make a prompt
             kwargs= {
-                "model": "text-davinci-003",
-                "prompt": prompt,
+                "model": "gpt-3.5-turbo",
+                "prompt": self.prompt,
+                "messages": self.message_list,
                 "max_tokens": 140,
                 "temperature": 1,
                 "top_p": 1,
@@ -152,3 +160,4 @@ class PersonalityHandler():
             print(response)
             ret = response["choices"][0]["text"]
             return ret
+

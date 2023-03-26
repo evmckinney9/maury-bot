@@ -1,6 +1,6 @@
 from abc import ABC
-from maury_bot.chatgpt3 import PersonalityHandler
-from maury_bot.variableBot import AbstractBot, AbstractBotPersonality
+from maury_bot.helpers.chatgpt import PersonalityHandler
+from maury_bot.bot.variableBot import AbstractBot, AbstractBotPersonality
 
 #  NOTE order matters here
 # multiple inheritance points get_personality to the Persona class

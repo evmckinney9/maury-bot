@@ -3,3 +3,4 @@ aiosqlite
 discord.py[voice]
 numpy
 openai
+pyyaml

@@ -7,7 +7,7 @@ import numpy as np
 from helpers import checks
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from maury_bot.variableBot import VariablePersonaBot
+    from maury_bot.bot.variableBot import VariablePersonaBot
 
 """"
 Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
@@ -37,6 +37,13 @@ from helpers import checks
 
 # Here we name the cog and create a new class for the cog.
 class Persona(commands.Cog, name="persona"):
+
+    """
+    Slash commands:
+        - chat
+        - switch
+    """
+
     def __init__(self, bot: "VariablePersonaBot"):
         self.bot = bot
         # self.title_list = title_list
@@ -63,7 +70,7 @@ class Persona(commands.Cog, name="persona"):
         #     prompt = f"{message}\n"
         # print(prompt)
         
-        prompt = f"A brief, silly yet foreboding greeting to {author}.\n"
+        prompt = f"Give a brief, silly yet foreboding greeting to {author}.\n"
         await self.bot.get_response(context=context, prompt=prompt, author=context.author)
 
     @commands.hybrid_command(
