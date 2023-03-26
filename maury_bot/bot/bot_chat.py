@@ -21,7 +21,14 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
     # message_json = [{"role": m.author.display_name, "content": m.content} for m in message_list]
     # if bot is the author, then role is "assistant"
     # prepend discord display name to all messages from bot and user
-    message_json = [{"role": "assistant" if m.author == bot.user else "user", "content": m.author.display_name + ": " + m.content} for m in message_list]
+    # message_json = [{"role": "assistant" if m.author == bot.user else "user", "content": m.author.display_name + ": " + m.content} for m in message_list]
+    message_json = []
+    for m in message_list:
+        if m.author == bot.user:
+            message_json.append({"role": "assistant", "content": m.content})
+        else:
+            message_json.append({"role": "user", "content": m.author.display_name + ": " + m.content})
+    
 
     # DEPRECATE, in GPT3.5+, should be able to identify itself in context
     # # Then, if there exists a message in the cache, remove all messages before it
@@ -44,14 +51,14 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
 import yaml
 
 def get_emote_response(emote_name, author):
-    with open('emotes.yaml', 'r') as stream:
+    with open('maury_bot/database/emotes.yaml', 'r') as stream:
         try:
             emotes = yaml.safe_load(stream)['emotes']
         except yaml.YAMLError as e:
             print(e)
     
     for em in emotes:
-        if any([kwarg == emote_name for kwarg in em['emojis'] for emote in em]):
-            return emotes['prompt'].format(author=author)
+        if any([emoji == emote_name for emoji in em['emojis']]):
+            return em['prompt'].format(author=author)
     
     return None
