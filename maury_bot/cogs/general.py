@@ -110,7 +110,7 @@ class General(commands.Cog, name="general"):
 
             # join vc, play mp3, disconnect
             vc = await channel.connect()
-            await asyncio.sleep(.5) # wait to connect
+            # await asyncio.sleep(.5) # wait to connect
             # def disconnect(error):
             #     asyncio.run_coroutine_threadsafe(vc.disconnect(), self.bot.loop)
             vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
@@ -118,6 +118,7 @@ class General(commands.Cog, name="general"):
             # Wait for the audio file to finish playing
             while vc.is_playing():
                 await asyncio.sleep(1)
+            await asyncio.sleep(1) # wait to disconnect?
             
             await vc.disconnect()
 
@@ -145,7 +146,7 @@ class General(commands.Cog, name="general"):
             message = "Clean your ears, boy."
     
         vc = await channel.connect()
-        await asyncio.sleep(.5) # wait to connect
+        # await asyncio.sleep(.5) # wait to connect
         # def disconnect(error):
         #     asyncio.run_coroutine_threadsafe(vc.disconnect(), self.bot.loop)
         vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
@@ -153,7 +154,7 @@ class General(commands.Cog, name="general"):
         # Wait for the audio file to finish playing
         while vc.is_playing():
             await asyncio.sleep(1)
-
+        await asyncio.sleep(1) # wait to disconnect?
         await vc.disconnect()
 
         # Send the message after the audio file has finished playing

@@ -83,7 +83,9 @@ class PersonalityHandler():
                 prompt += f"Use the personality of {self.personality}."
 
                 # custom emotes
-                prompt += "Always use the discord's custom emotes when applicable."
+                # NOTE only tell it about emotes if it's not a voice message
+                prompt += "Always use the discord's custom emotes when applicable, typically put at the end of the message."
+                prompt += "Format as <:emote_name:1234> in your messages."
                 import yaml
                 with open('maury_bot/database/emotes.yaml', 'r') as stream:
                     try:
@@ -157,11 +159,30 @@ class PersonalityHandler():
             if self.author is not None and self.author.mention not in message:
                 message = f"{self.author.mention} {message}"
 
+            if not self.context:
+                return message
+            
             # need to reformat server emotes
+            # XXX slow!!!! 
             # :emote: -> <:emote:1234567890>
             for emote in self.context.guild.emojis:
-                message = message.replace(f":{emote.name}:", f"<:{emote.name}:{emote.id}>")
-
+                if emote.name not in message:
+                    continue
+               # important to check this one first, bc if it exists, it will be with a wrong id
+                if re.search(rf"<:{emote.name}:[0-9]+>", message):
+                    # message = re.sub(rf"<:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)
+                    message = re.sub(rf"<:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)
+                    continue
+                if re.search(rf"<{emote.name}>", message):
+                    message = re.sub(rf"<{emote.name}>", f"<:{emote.name}:{emote.id}>", message)
+                    continue
+                if re.search(rf":{emote.name}: ", message):
+                    message = re.sub(rf" :{emote.name}: ", f" <:{emote.name}:{emote.id}> ", message)
+                    continue
+                #sometimes thinks it is an animated emote
+                if re.search(rf"<a:{emote.name}:[0-9]+>", message):
+                    message = re.sub(rf"<a:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)
+            
             return message
 
         def chatgpt(self) -> str:
@@ -192,5 +213,6 @@ class PersonalityHandler():
             response = openai.ChatCompletion.create(**kwargs) # NOTE old version was openai.Completion.create(**kwargs)
             # print(response)
             ret = response["choices"][0]["message"]["content"]
+            print(ret)
             return ret
 
