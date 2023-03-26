@@ -1,28 +1,28 @@
-""""
-Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
-Description:
-This is a template to create your own discord bot in python.
+# """"
+# Copyright © Krypton 2022 - https://github.com/kkrypt0nn (https://krypton.ninja)
+# Description:
+# This is a template to create your own discord bot in python.
 
-Version: 5.4
-"""
+# Version: 5.4
+# """
 
-import discord
-from discord import app_commands
-from discord.ext import commands
-from discord.ext.commands import Context
+# import discord
+# from discord import app_commands
+# from discord.ext import commands
+# from discord.ext.commands import Context
 
-from helpers import checks, db_manager
+# from helpers import checks, db_manager
 
 
-class Moderation(commands.Cog, name="moderation"):
-    """
-    List of commands:
-        - Kick
-        - Ban
-        - Warn
-    """
-    def __init__(self, bot):
-        self.bot = bot
+# class Moderation(commands.Cog, name="moderation"):
+#     """
+#     List of commands:
+#         - Kick
+#         - Ban
+#         - Warn
+#     """
+#     def __init__(self, bot):
+#         self.bot = bot
 
 #     @commands.hybrid_command(
 #         name="kick",

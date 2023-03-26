@@ -110,13 +110,19 @@ class General(commands.Cog, name="general"):
 
             # join vc, play mp3, disconnect
             vc = await channel.connect()
-            vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+            await asyncio.sleep(.5) # wait to connect
+            # def disconnect(error):
+            #     asyncio.run_coroutine_threadsafe(vc.disconnect(), self.bot.loop)
+            vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
+
+            # Wait for the audio file to finish playing
             while vc.is_playing():
                 await asyncio.sleep(1)
+            
             await vc.disconnect()
 
-            # reply back to channel with what was spoken
-            await context.send(bot_message, ephemeral=False) 
+            # Send the message after the audio file has finished playing
+            await context.send(self.bot.voice_message, ephemeral=False)
 
         finally:
             self.bot.voice_message_mutex.release()
@@ -130,18 +136,27 @@ class General(commands.Cog, name="general"):
         galley_channel_id = 818370274126069828
         channel = self.bot.get_channel(galley_channel_id)
         await context.defer(ephemeral=False)
+
+        fp = "maury_bot/database/synthesized_audio/audio.mp3"
+
         try:
-            fp = self.bot.voice_file_path
             message = self.bot.voice_message
         except:
-            fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
-            message = "I don't have anything to repeat"
-        # try default audio
+            message = "Clean your ears, boy."
+    
         vc = await channel.connect()
-        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+        await asyncio.sleep(.5) # wait to connect
+        # def disconnect(error):
+        #     asyncio.run_coroutine_threadsafe(vc.disconnect(), self.bot.loop)
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
+
+        # Wait for the audio file to finish playing
         while vc.is_playing():
             await asyncio.sleep(1)
+
         await vc.disconnect()
+
+        # Send the message after the audio file has finished playing
         await context.send(message, ephemeral=False)
 
     @commands.hybrid_command(
@@ -154,17 +169,15 @@ class General(commands.Cog, name="general"):
         galley_channel_id = 818370274126069828
         channel = self.bot.get_channel(galley_channel_id)
         await context.defer(ephemeral=False)
-        vc = await channel.connect()
-
         # define some random chance
         p = 0.1
         if random.random() < p:
             # play default audio
             fp = "maury_bot/database/synthesized_audio/default_audio.mp3"
-            vc.play(discord.FFmpegPCMAudio(fp))
-
+            
         else:
-            k = 3 # number of ellipses
+            # k = 3 # number of ellipses
+            k = random.randint(1, 5)
             #"I uhhhh, ... am NOT crazy!"
             prompt = "I uhhhh, "
             for i in range(k):
@@ -182,12 +195,19 @@ class General(commands.Cog, name="general"):
                 # self.bot.voice_message_mutex.release() # don't use, will still execute finally
                 return
             
-        vc.play(discord.FFmpegPCMAudio(fp)) #, after=lambda e: print('done', e))
+        vc = await channel.connect()
+        # add a delay to connect
+        await asyncio.sleep(.5)
+        vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
+
+        # Wait for the audio file to finish playing
         while vc.is_playing():
             await asyncio.sleep(1)
+        
         await vc.disconnect()
-        await context.send("I'm not crazy, you're crazy!", ephemeral=False)
 
+        # Send the message after the audio file has finished playing
+        await context.send("I'm not crazy, you're crazy!", ephemeral=False)
 
 async def setup(bot):
     await bot.add_cog(General(bot))

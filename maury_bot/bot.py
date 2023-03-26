@@ -246,7 +246,7 @@ async def load_cogs() -> None:
     The code in this function is executed whenever the bot will start.
     """
     for file in os.listdir(f"maury_bot/cogs"):
-        if file.endswith(".py"):
+        if file.endswith(".py") and not file.startswith("_"):
             extension = file[:-3]
             try:
                 await bot.load_extension(f"cogs.{extension}")

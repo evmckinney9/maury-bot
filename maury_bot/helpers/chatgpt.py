@@ -53,6 +53,7 @@ class PersonalityHandler():
             # prepend prompt to message_list
             # example: {"role": "system", "content": "You are a helpful assistant."}
             self.prompt_cleaner(self.prompt, reprhase=True)
+
             self.message_list.insert(0, {"role": "system", "content": self.prompt})
             # print(self.prompt)
 
@@ -140,11 +141,15 @@ class PersonalityHandler():
                 # response_text = response_text.replace(reactor.display_name, reactor.mention)
                 message = re.sub(self.reactor.display_name, self.reactor.mention, message, flags=re.IGNORECASE)
 
+            # sometimes, the bot will write a user's name like <502280530520440862> 
+            # but it needs to be <@502280530520440862> for it to be a mention
+            # use re to fix
+            message = re.sub(r"<([0-9]+)>", r"<@\1>", message)
 
             # if there are no mentions of the author, add it manually to the start
             if self.author is not None and self.author.mention not in message:
                 message = f"{self.author.mention} {message}"
-                
+
             return message
 
         def chatgpt(self) -> str:

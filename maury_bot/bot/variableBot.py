@@ -43,8 +43,9 @@ class AbstractBot(ABC, Bot):
     # def get_name(self) -> str:
     #     return self.name
     
-    async def get_response(self, context: Context, message_list:List[str], **kwargs)-> None:
+    async def get_response(self, context: Context, message_list:List[str]=[], **kwargs)-> None:
         """Returns a response from GPT-3
+        if message_list is None, bot will respond only using the system prompt
         Optional kwargs:
         prompt: str, GPT system prompt (says how to behave/what to do/respond with certain emotion/etc)
         author: User
