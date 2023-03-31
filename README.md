@@ -1,6 +1,6 @@
 ## Python Discord Bot with GPT-3 Integration
 
-#### I am currently working on rewriting to be compatible with GPT-3.5+, with many more features!
+#### I am currently working on many more features! Current README documentation is slightly outdated with [latest release](https://github.com/evmckinney9/maury-bot/releases/tag/v0.3.0)
 ___
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
