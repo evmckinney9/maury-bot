@@ -21,7 +21,7 @@ Use `/chat` to get a "Hello, World!" message.
 
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
-Use command `/speak` to get a voice message into the voice channel.
+Use command `/speak` to get a voice message into the voice channel. To speak a message exactly as you type use "", otherwise will translate into the voice of your bot.
 
 ![image](https://user-images.githubusercontent.com/47376937/220812870-945ef997-53c3-4872-b546-209be9595563.png)
 
