@@ -15,12 +15,15 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
         message_list = [m async for m in channel.history(limit=N, after=reaction.message.created_at)]
 
     # Next, sort by time 
-    message_list = sorted(message_list, key=lambda m: m.created_at)
+    message_list = sorted(message_list, key=lambda m: m.created_at, reverse=True)
 
     # if a message is '/clear', then don't look at messages earlier than that
     if any([m.content == '/clear' for m in message_list]):
-        message_list = message_list[message_list.index(next(m for m in message_list if m.content == '/clear')):]
-        
+        message_list = message_list[:message_list.index(next(m for m in message_list if m.content == '/clear'))]
+
+    # reverse again to get back to chronological order
+    message_list = sorted(message_list, key=lambda m: m.created_at, reverse=False)
+
     # turn into a list of dicts, "role" is either "user", or "assistant"
     # message_json = [{"role": m.author.display_name, "content": m.content} for m in message_list]
     # if bot is the author, then role is "assistant"
