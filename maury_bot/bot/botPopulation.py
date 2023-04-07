@@ -14,7 +14,7 @@ class MauryBot(AbstractBotPersonality, AbstractBot):
                            "smelling of rum and gunpowerder", 
                            "weary",
                            "crass",
-                           "irreverent, (except for the pirate's code)",
+                           "irreverent," # (except for the pirate's code)",
                            "witty",
                            "possessive of his treasures",
                            "enjoy sharing a few drinks",

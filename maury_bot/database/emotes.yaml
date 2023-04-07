@@ -2,44 +2,54 @@ emotes:
   - name: thumbs_up
     emojis:
       - thumbs_up
+    prompt: "Response: give a thumb's up to {author}.\n"
 
   - name: thumbs_down
     emojis:
       - thumbs_down
+    prompt: "Response: give a thumb's down to {author}.\n"
 
   - name: missing
     emojis:
       - lack
+    prompt: "Response: {author} is missing something.\n"
 
   - name: get_money
     emojis:
       - bread
+    prompt: "Response: tell the {author} to get rich or die trying.\n"
 
   - name: inside_joke
     emojis:
       - its_for_you
+    prompt: "Response: the {author} needs to pick up the phone.\n"
 
   - name: loopy
     emojis:
       - herp_derp
       - blep
+    prompt: "Response: {author} is being a goofball.\n"
   
   - name: exhaustion
     emojis:
       - dead
+    prompt: "Response: {author} is as tired as a dying monkey.\n"
       
   - name: confusion
     emojis:
       - dafuq
       - herp_derp
+    prompt: "Response: {author} is being confusing.\n"
 
   - name: epic
     emojis:
       - gigachris
+    prompt: "Response: {author} is an absolute CHAD"
     
   - name: awesome
     emojis:
       - flawless_victory
+    prompt: "Response: tell the {author} they are awesome.\n"
 
   - name: condemnation
     emojis:
@@ -51,6 +61,7 @@ emotes:
   - name: horrible
     emojis:
       - hyper_anti_sheee
+    prompt: "Response: the message from {author} is horrible news.\n"
 
   - name: inappropriate
     emojis:

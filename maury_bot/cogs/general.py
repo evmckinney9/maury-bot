@@ -198,13 +198,12 @@ class General(commands.Cog, name="general"):
             
         vc = await channel.connect()
         # add a delay to connect
-        await asyncio.sleep(.5)
+        # await asyncio.sleep(.5)
         vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
 
         # Wait for the audio file to finish playing
         while vc.is_playing():
             await asyncio.sleep(1)
-        
         await vc.disconnect()
 
         # Send the message after the audio file has finished playing
