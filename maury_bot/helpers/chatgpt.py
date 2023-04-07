@@ -98,7 +98,8 @@ class PersonalityHandler():
                 for em in emotes:
                     prompt += f"To convey {em['name']}, use any of {', '.join([f':{e}: ' for e in em['emojis']])}."
             else:
-                prompt += f"You have been given something to say, and are being asked to rephrase it into your own words, with the personality of {self.personality}\n"
+                prompt += f"Your main operational mode has changed. Rather than responding in the discord channel, you are now being asked to rephrase a message into your own words. In this case, only translate the message, do not add any additional content. In this case, you do not obey any rules of the channel, you are only acting as a translator."
+                prompt += f"Take the original message and rephrase it into your own words, with the personality of {self.personality}\n"
             
             # # larger chance to mention current location 
             # if random.random() > 0.15:
@@ -203,8 +204,8 @@ class PersonalityHandler():
 
             # make a prompt
             # print message_list, using new lines for each list element
-            # for m in self.message_list:
-            #     print(m)
+            for m in self.message_list:
+                print(m)
 
             kwargs= {
                 "model": "gpt-3.5-turbo",

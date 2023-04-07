@@ -16,7 +16,11 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
 
     # Next, sort by time 
     message_list = sorted(message_list, key=lambda m: m.created_at)
-    
+
+    # if a message is '/clear', then don't look at messages earlier than that
+    if any([m.content == '/clear' for m in message_list]):
+        message_list = message_list[message_list.index(next(m for m in message_list if m.content == '/clear')):]
+        
     # turn into a list of dicts, "role" is either "user", or "assistant"
     # message_json = [{"role": m.author.display_name, "content": m.content} for m in message_list]
     # if bot is the author, then role is "assistant"
