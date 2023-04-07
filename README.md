@@ -1,6 +1,6 @@
 ## Python Discord Bot with GPT-3 Integration
 
-#### I am currently working on rewriting to be compatible with GPT-3.5+, with many more features!
+#### I am currently working on many more features! Current README documentation is slightly outdated with [latest release](https://github.com/evmckinney9/maury-bot/releases/tag/v0.3.0)
 ___
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
@@ -12,11 +12,16 @@ Tag @bot to respond to any message:
 
 ![image](https://user-images.githubusercontent.com/47376937/220812662-8d0e33ed-cc7f-47cb-80ae-c2c0ab96b161.png)
 
+Responds with the server's emotes:
+
+![image](https://user-images.githubusercontent.com/47376937/227757680-3d21122b-b850-45ef-88b5-6c242408cd86.png)
+
+
 Use `/chat` to get a "Hello, World!" message.
 
 ![image](https://user-images.githubusercontent.com/47376937/210667776-d6ae0d35-06a0-4d03-a0d3-a344ed725ae9.png)
 
-Use command `/speak` to get a voice message into the voice channel.
+Use command `/speak` to get a voice message into the voice channel. To speak a message exactly as you type use "", otherwise will translate into the voice of your bot.
 
 ![image](https://user-images.githubusercontent.com/47376937/220812870-945ef997-53c3-4872-b546-209be9595563.png)
 
