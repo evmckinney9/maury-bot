@@ -39,7 +39,7 @@ class PersonalityHandler():
             self.message_list = message_list
             if self.context is None:
                 raise ValueError("missing context")
-            if self.message_list is None:
+            if self.message_list is None or len(self.message_list) == 0:
                 # give warning, might gpt might not go first
                 # NOTE needs debug, if this case breaks, just give message_list 
                 # something default, like "hello" from user (?)
@@ -98,7 +98,7 @@ class PersonalityHandler():
                 for em in emotes:
                     prompt += f"To convey {em['name']}, use any of {', '.join([f':{e}: ' for e in em['emojis']])}."
             else:
-                prompt += f"Your main operational mode has changed. Rather than responding in the discord channel, you are now being asked to rephrase a message into your own words. In this case, only translate the message, do not add any additional content. In this case, you do not obey any rules of the channel, you are only acting as a translator."
+                prompt += f"Rather than responding in the discord channel, you are now being asked to rephrase a message into your own words. In this case, only translate the message, do not add any additional content. You are writing a message for yourself in the voice-channel, and the provided original message is what you are going to say. In this case, you do not obey any rules of the channel, you are only acting as a translator. To be clear, you should not announce that you are translating the message, you should simply translate it. Do NOT start your message with 'Translation:' or anything similar. "
                 prompt += f"Take the original message and rephrase it into your own words, with the personality of {self.personality}\n"
             
             # # larger chance to mention current location 
@@ -124,6 +124,7 @@ class PersonalityHandler():
                     prompt = prompt.replace(f"<@{user.id}>", user.display_name)
             
             self.prompt = prompt
+            # print(self.prompt)
 
         def response_cleaner(self, message: str) -> str:
             """Cleans the response from GPT-3"""
@@ -188,6 +189,10 @@ class PersonalityHandler():
                 if re.search(rf":{emote.name}: ", message):
                     message = re.sub(rf" :{emote.name}: ", f" <:{emote.name}:{emote.id}> ", message)
                     continue
+                # previous checks if emote followed by a space, this one checks same case without space but only if it is the last character
+                if re.search(rf":{emote.name}:$", message):
+                    message = re.sub(rf":{emote.name}:$", f"<:{emote.name}:{emote.id}>", message)
+                    continue                
                 #sometimes thinks it is an animated emote
                 if re.search(rf"<a:{emote.name}:[0-9]+>", message):
                     message = re.sub(rf"<a:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)

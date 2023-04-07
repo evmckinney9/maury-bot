@@ -93,7 +93,9 @@ class General(commands.Cog, name="general"):
             else:
                 # convert message to personality
                 # NOTE context should not matter here, since gets overridden when send_it is False
-                bot_message = await self.bot.get_response(context=channel, prompt= f'Original message: {message_arg}\n', voice_message=True)
+                # ({"role": "user", "content": m.author.display_name + ": " + m.content}
+                message_list = [{"role": "user", "content": message_arg}]
+                bot_message = await self.bot.get_response(context=channel, message_list= message_list, voice_message=True)
             self.bot.voice_message = bot_message
 
             # ret = get_voice_message("Captain Maury", "Hey Kid,... scram!")
