@@ -163,7 +163,8 @@ class PersonalityHandler():
             message = re.sub(r"(<@!?[0-9]+>)(\s\1)+", r"\1", message)
 
             # never tag itself
-            message = message.replace(f"<@!{self.id}>", "")
+            # XXX hardcoded id
+            message = message.replace(f"<@!{1003142015179034624}>", "")
 
             if not self.context:
                 return message

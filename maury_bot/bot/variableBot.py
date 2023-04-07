@@ -73,7 +73,7 @@ class VariablePersonaBot(AbstractBot):
         
         # sets the default persona to DaemonMax
         if persona is None:
-            from maury_bot.bot.botPopulation import MauryBot, DottyBot, DaemonMax
+            from maury_bot.bot.botPopulation import MauryBot#, DottyBot, DaemonMax
             persona = MauryBot()
             # persona = DaemonMax()
 
@@ -83,26 +83,34 @@ class VariablePersonaBot(AbstractBot):
         self.get_status = None
         self.get_handler = None
         self.avatar = None
-        self.switch_to(persona)
+        self.set_persona(persona)
         self.responded_to_messages = []
         self.high_activity = 0
         super().__init__()
 
-    def switch_to(self, bot: AbstractBotPersonality=None):
-        from maury_bot.bot.botPopulation import MauryBot, DottyBot, DaemonMax
-
-        """Switches the current bot to the given bot"""
-        if bot is None and isinstance(self.current_bot, MauryBot):
-            bot = DottyBot()
-        elif bot is None and isinstance(self.current_bot, DottyBot):
-            bot = MauryBot()
-
+    def set_persona(self, bot: AbstractBotPersonality):
         self.current_bot = bot
         self.get_name = partial(self.current_bot.get_name)
         self.get_personality = partial(self.current_bot.get_personality)
         self.get_status = partial(self.current_bot.get_status)
         self.get_handler = partial(self.current_bot.get_handler)
         self.avatar = self.current_bot.avatar
+
+    # def switch_to(self, bot: AbstractBotPersonality=None):
+    #     from maury_bot.bot.botPopulation import MauryBot#, DottyBot, DaemonMax
+
+    #     """Switches the current bot to the given bot"""
+    #     if bot is None and isinstance(self.current_bot, MauryBot):
+    #         bot = DottyBot()
+    #     elif bot is None and isinstance(self.current_bot, DottyBot):
+    #         bot = MauryBot()
+
+    #     self.current_bot = bot
+    #     self.get_name = partial(self.current_bot.get_name)
+    #     self.get_personality = partial(self.current_bot.get_personality)
+    #     self.get_status = partial(self.current_bot.get_status)
+    #     self.get_handler = partial(self.current_bot.get_handler)
+    #     self.avatar = self.current_bot.avatar
 
     #XXX careful, rate limiting prevents this from being called, only once every 10 minutes (?)
     async def discord_refresh_persona(self):
