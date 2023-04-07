@@ -6,7 +6,7 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
     Rules for history, max N messages, -60 seconds, stop if hit a message in responded_to cache
     Example API json arg: "messages": [{"role": "user", "content": "Hello!"}]
     """
-    N = 5
+    N = 10
     # First, get the last N messages
     if reaction is None:
         message_list = [m async for m in channel.history(limit=N)]
