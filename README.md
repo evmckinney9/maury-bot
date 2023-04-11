@@ -71,7 +71,8 @@ I use Raspberry Pi OS Lite with this application running in the background using
           "YOUR_DISCORD_USER_ID",
           502280530520440862
       ],
-      "openai_api_key": "YOUR_OPENAI_KEY_HERE"
+      "openai_api_key": "YOUR_OPENAI_KEY_HERE",
+      "elevenlabs_key": "YOUR_ELEVENLABS_KEY_HERE",
   }
   ```
 ### 3. Start Application
