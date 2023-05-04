@@ -133,7 +133,7 @@ class PersonalityHandler():
         def response_cleaner(self, message: str) -> str:
             """Cleans the response from GPT-3"""
             # remove newline chars
-            message = message.replace("\n", "")
+            # message = message.replace("\n", "")
             message = message.replace("  ", " ")
 
             # don't start or end with qoutes
@@ -161,13 +161,21 @@ class PersonalityHandler():
             # but it needs to be <@502280530520440862> for it to be a mention
             # use re to fix
             message = re.sub(r"<([0-9]+)>", r"<@\1>", message)
-
-            # if there are no mentions of the author, add it manually to the start
-            if self.author is not None and self.author.mention not in message:
-                message = f"{self.author.mention} {message}"
             
             # don't tag any person more than once
             message = re.sub(r"(<@!?[0-9]+>)(\s\1)+", r"\1", message)
+
+            # if a mention appears in the message, if it exists, remove mention that starts the message
+            # check if mention in message more than once
+            if self.author is not None and self.author.mention in message:
+                if message.count(self.author.mention) > 1:
+                    # if message begins with author mention, remove it
+                    if message.startswith(self.author.mention):
+                        message = message.replace(self.author.mention, "", 1)
+                
+            # if there are no mentions of the author, add it manually to the start
+            elif self.author is not None and self.author.mention not in message:
+                message = f"{self.author.mention} {message}"
 
             # never tag itself
             # XXX hardcoded id
@@ -186,6 +194,11 @@ class PersonalityHandler():
                 if re.search(rf"<:{emote.name}:[0-9]+>", message):
                     # message = re.sub(rf"<:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)
                     message = re.sub(rf"<:{emote.name}:[0-9]+>", f"<:{emote.name}:{emote.id}>", message)
+                    continue
+                
+                # (emote) -> <:emote:1234567890>
+                if re.search(rf"\({emote.name}\)", message):
+                    message = re.sub(rf"\({emote.name}\)", f"<:{emote.name}:{emote.id}>", message)
                     continue
                 if re.search(rf"<{emote.name}>", message):
                     message = re.sub(rf"<{emote.name}>", f"<:{emote.name}:{emote.id}>", message)

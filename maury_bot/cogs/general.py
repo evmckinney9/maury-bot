@@ -189,7 +189,7 @@ class General(commands.Cog, name="general"):
 
             # get response
             # ret = get_voice_message("Captain Maury", "Hey Kid,... scram!")
-            status, fp = get_voice_message(self.bot.get_name(), prompt)
+            status, fp = get_voice_message(self.bot.get_name(), prompt, stream=True)
             self.bot.voice_file_path = fp
 
             if status == 0:
@@ -201,7 +201,7 @@ class General(commands.Cog, name="general"):
         vc = await channel.connect()
         # add a delay to connect
         # await asyncio.sleep(.5)
-        vc.play(discord.FFmpegPCMAudio(fp)) #, after=disconnect)
+        vc.play(discord.FFmpegPCMAudio(fp.content.read())) #, after=disconnect)
 
         # Wait for the audio file to finish playing
         while vc.is_playing():

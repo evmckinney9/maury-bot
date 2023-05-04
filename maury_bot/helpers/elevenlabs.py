@@ -19,7 +19,7 @@ import requests
 import json
 import random
 
-def get_voice_message(bot_name, message_text):
+def get_voice_message(bot_name, message_text, stream=False):
     """
     params:
         bot_name: string - should match one of the voices available from elevenlabs
@@ -68,12 +68,20 @@ def get_voice_message(bot_name, message_text):
     
     # send request to convert text to speech
     print("Sending request to convert text to speech...")
-    response = requests.post(url + "text-to-speech/" + voice_id, json={"text": message_text}, headers=headers)
+
+    if stream:
+        #return (1, url + "text-to-speech/" + voice_id + "/stream")
+        response = requests.post(url + "text-to-speech/" + voice_id + "/stream", json={"text": message_text}, headers=headers, stream=True)
+    else:
+        response = requests.post(url + "text-to-speech/" + voice_id, json={"text": message_text}, headers=headers)
     
     if response.status_code != 200:
         print(response.text)
         return (0, f"Request failed with status code: {response.status_code}")
     
+    if stream:
+        return (1, response)
+
     # write out audio file
     # NOTE, if we wanted, we could save to a unique file name and return that
     print("Writing audio file...")
