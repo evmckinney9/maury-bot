@@ -82,24 +82,26 @@ class PersonalityHandler():
             
             if not reprhase:
                 #personality
-                prompt += f"Use the personality: {self.personality}."
+                prompt += f"Use the following personality: {self.personality}."
 
                 # custom emotes
                 # NOTE only tell it about emotes if it's not a voice message
-                prompt += "Always use the discord's custom emotes when applicable, typically put at the end of the message."
+                prompt += "Always use the custom discord's emotes when applicable, typically put at the end of the message."
                 prompt += "Always format emotes as <:emote_name:1234> in your messages, where emote_name can be changed."
                 import yaml
                 with open('maury_bot/database/emotes.yaml', 'r') as stream:
                     try:
                         emotes = yaml.safe_load(stream)['emotes']
+                        # XXX BAD nested list comprehension, but it works
+                        emote_names = [emoji for emote in emotes for emoji in emote['emojis']]
                     except yaml.YAMLError as e:
                         print(e)
                 
-                for em in emotes:
-                    prompt += f"To convey {em['name']}, use any of {', '.join([f':{e}: ' for e in em['emojis']])}."
+                prompt += f"Here are the valid custom 'emote_name's: {', '.join(emote_names)}.\n"
+            
             else:
-                prompt += f"Rather than responding in the discord channel, you are now being asked to rephrase a message into your own words. In this case, only translate the message, do not add any additional content. You are writing a message for yourself in the voice-channel, and the provided original message is what you are going to say. In this case, you do not obey any rules of the channel, you are only acting as a translator. To be clear, you should not announce that you are translating the message, you should simply translate it. Do NOT start your message with 'Translation:' or anything similar. "
-                prompt += f"Take the original message and rephrase it into your own words, with the personality of {self.personality}\n"
+                prompt += f"Rather than responding in the discord channel, you are now being asked to rephrase a message into your own words. In this case, only translate the message, do not add any additional content. You are writing a message for yourself to speak in the voice-channel, and the provided original message is what you are going to say. In this case, you do not obey any rules of the channel, you are only acting as a translator. To be clear, you should not announce that you are translating the message, you should simply translate it. Do NOT start your message with 'Translation:' or anything similar. "
+                prompt += f"Take the message and rephrase it into your own words, with the personality of {self.personality}\n"
             
             # # larger chance to mention current location 
             # if random.random() > 0.15:
@@ -113,7 +115,8 @@ class PersonalityHandler():
 
             if self.author is not None:
                 # prompt += f"Remember that {self.author.display_name} wrote this message and mention them.\n"
-                prompt += f"{self.author.display_name} wrote the message you are responding to. Be sure to tag them at the start, but no need to tag anybody else.\n"
+                prompt += f"{self.author.display_name} wrote the message you are responding to. Be sure to tag them at the start of your response, and do not tag anybody else unless instructed to.\n"
+            prompt += f"The messages you are responding to include a tag for {self.name}, but you should never include that in your response, because you have no reason to tag yourself.\n"
 
             # remove emotes, use re <:emote:1234567890> and replace with emote name
             prompt = re.sub(r"<:([^:]+):[0-9]+>", r"\1", prompt)
@@ -124,6 +127,7 @@ class PersonalityHandler():
                     prompt = prompt.replace(f"<@{user.id}>", user.display_name)
             
             self.prompt = prompt
+            #DEBUG
             # print(self.prompt)
 
         def response_cleaner(self, message: str) -> str:
@@ -208,7 +212,7 @@ class PersonalityHandler():
                 openai.api_key = data["openai_api_key"]
 
             # print message_list, using new lines for each list element
-            # # DEBUG
+            # # # DEBUG
             # for m in self.message_list:
             #     print(m)
 

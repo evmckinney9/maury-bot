@@ -1,4 +1,12 @@
 emotes:
+
+  - name: raise_a_glass
+    emojis:
+      - toast
+      - my_turn
+      - bread
+    prompt: "Response: raise a glass to {author}. \n"
+    
   - name: thumbs_up
     emojis:
       - thumbs_up

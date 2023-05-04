@@ -30,7 +30,7 @@ class AbstractBotPersonality(ABC):
     def get_personality(self) -> str:
         # return f"a {', '.join(self.adjectives)} {self.verb} at a {self.location}"
         persona = f"You are {self.description}"
-        persona = f"You are {','.join(self.adjectives)}"
+        persona += f"You are {', '.join(self.adjectives)}"
         persona += f"You perform these actions {', '.join(self.verbs)}"
         persona += f"You are at {', '.join(self.locations)}"
         return persona
