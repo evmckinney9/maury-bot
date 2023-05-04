@@ -1,6 +1,8 @@
 ## Python Discord Bot with GPT-3 Integration
 
 #### I am currently working on many more features! Current README documentation is slightly outdated with [latest release](https://github.com/evmckinney9/maury-bot/releases/tag/v0.3.0)
+Join this discord: https://discord.gg/KtEpyEUX
+I'll help you set up the bot on your own server and help you maintain it. :)
 ___
 #### This discord bot will intelligently respond to you on discord, with a chance to be triggered on when users emote react to messages.
 
@@ -71,7 +73,8 @@ I use Raspberry Pi OS Lite with this application running in the background using
           "YOUR_DISCORD_USER_ID",
           502280530520440862
       ],
-      "openai_api_key": "YOUR_OPENAI_KEY_HERE"
+      "openai_api_key": "YOUR_OPENAI_KEY_HERE",
+      "elevenlabs_key": "YOUR_ELEVENLABS_KEY_HERE",
   }
   ```
 ### 3. Start Application
