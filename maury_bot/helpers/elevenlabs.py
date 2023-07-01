@@ -32,7 +32,7 @@ def get_voice_message(bot_name, message_text, stream=False):
 
     url = "https://api.elevenlabs.io/v1/"
 
-    if len(message_text) > 1000:
+    if len(message_text) > 2000:
         return (0, "Message too long, max 1000 characters")
 
     # get api key from config.json
@@ -69,6 +69,7 @@ def get_voice_message(bot_name, message_text, stream=False):
     # send request to convert text to speech
     print("Sending request to convert text to speech...")
 
+    stream = False #override broken behavior
     if stream:
         #return (1, url + "text-to-speech/" + voice_id + "/stream")
         response = requests.post(url + "text-to-speech/" + voice_id + "/stream", json={"text": message_text}, headers=headers, stream=True)
