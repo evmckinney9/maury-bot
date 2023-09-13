@@ -257,11 +257,23 @@ class PersonalityHandler():
                 "n": 1,
             }
 
-            # Run OpenAI API call in a separate thread to prevent blocking
-            loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(**kwargs))
+            try:
+        
+                loop = asyncio.get_event_loop()
 
-            ret = response["choices"][0]["message"]["content"]
-            print(ret)
-            return ret
+                # Run OpenAI API call in a separate thread to prevent blocking
+                # Add a timeout of 10 seconds
+                response = await asyncio.wait_for(loop.run_in_executor(None, lambda: openai.ChatCompletion.create(**kwargs)), timeout=10)
+
+                ret = response["choices"][0]["message"]["content"]
+                print(ret)
+                return ret
+
+            except TimeoutError:
+                print("OpenAI API call timed out.")
+                return "I'm sorry, I took too long to respond."
+
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                return "I'm sorry, something went wrong."
 
