@@ -1,4 +1,22 @@
 from datetime import timedelta
+
+import asyncio
+import aiohttp
+
+async def fetch_channel_history(channel, limit=None, after=None, retries=3, delay=5):
+    for i in range(retries):
+        try:
+            if after is None:
+                return [m async for m in channel.history(limit=limit)]
+            else:
+                return [m async for m in channel.history(limit=limit, after=after)]
+        except aiohttp.client_exceptions.ClientConnectorError:
+            if i < retries - 1:  # i is zero indexed
+                await asyncio.sleep(delay)  # Wait for some time before trying again
+                continue
+            else:
+                raise  # Re-raise the exception if all retries fail
+
 async def construct_chat_history(bot, channel, reaction=None, mentions=None):
     """
     Builds chat history to pass as context to the model
@@ -9,10 +27,10 @@ async def construct_chat_history(bot, channel, reaction=None, mentions=None):
     N = 10
     # First, get the last N messages
     if reaction is None:
-        message_list = [m async for m in channel.history(limit=N)]
+        message_list = await fetch_channel_history(channel, limit=N)
     else:
         # get messages before the reacted message, +1 second to include the reacted message itself
-        message_list = [m async for m in channel.history(limit=N, after=reaction.message.created_at)]
+        message_list = await fetch_channel_history(channel, limit=N, after=reaction.message.created_at)
 
     # Next, sort by time 
     message_list = sorted(message_list, key=lambda m: m.created_at, reverse=True)
