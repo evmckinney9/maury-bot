@@ -5,11 +5,25 @@ import json
 from discord.ext.commands import Context
 from discord import User
 import random
+import asyncio
 import re
 
 from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
     from maury_bot.bot.variableBot import Persona
+
+
+# Global variable to store the OpenAI API key
+OPENAI_API_KEY = None
+
+def load_config():
+    global OPENAI_API_KEY
+    with open("config.json") as file:
+        data = json.load(file)
+        OPENAI_API_KEY = data["openai_api_key"]
+
+# Call this function once when your application starts
+load_config()
 
 class PersonalityHandler():
     def __init__(self, persona: Persona):
@@ -61,14 +75,14 @@ class PersonalityHandler():
 
             if self.context != 0: # 0 indicates voice message, mean's we don't want to wrap in async typing
                 async with self.context.typing():
-                    ret = self.chatgpt()
+                    ret = await self.chatgpt()
                     response_text = self.response_cleaner(ret)
                     return response_text
 
             else: # if context == 0, don't wrap in async typing
                 # XXX assuming this case is only true for voice messages
                 assert self.context == 0
-                ret = self.chatgpt()
+                ret = await self.chatgpt()
                 response_text = self.response_cleaner(ret)
                 return response_text
 
@@ -217,13 +231,16 @@ class PersonalityHandler():
             
             return message
 
-        def chatgpt(self) -> str:
+        async def chatgpt(self) -> str:
             """Returns a response from GPT-3"""
 
-            # get api key from config.json
-            with open("config.json") as file:
-                data = json.load(file)
-                openai.api_key = data["openai_api_key"]
+            # # get api key from config.json
+            # with open("config.json") as file:
+            #     data = json.load(file)
+            #     openai.api_key = data["openai_api_key"]
+
+            # use global variable instead of loading each time
+            openai.api_key = OPENAI_API_KEY
 
             # print message_list, using new lines for each list element
             # # # DEBUG
@@ -240,10 +257,10 @@ class PersonalityHandler():
                 "n": 1,
             }
 
-            # generate a response
-            print("Generating response...")
-            response = openai.ChatCompletion.create(**kwargs) # NOTE old version was openai.Completion.create(**kwargs)
-            # print(response)
+            # Run OpenAI API call in a separate thread to prevent blocking
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(**kwargs))
+
             ret = response["choices"][0]["message"]["content"]
             print(ret)
             return ret
