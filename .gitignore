@@ -1,3 +1,8 @@
+.vscode
+
+#ruff
+.ruff_cache
+
 config.json
 *_venv
 # Byte-compiled / optimized / DLL files

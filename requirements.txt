@@ -1,7 +1,0 @@
-aiohttp
-aiosqlite
-discord.py[voice]
-numpy
-openai
-pyyaml
-elevenlabs
