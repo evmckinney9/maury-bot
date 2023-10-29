@@ -1,14 +1,8 @@
-from elevenlabs import voices, generate
-from elevenlabs import set_api_key
-from elevenlabs.api import VoiceSettings
-from discord import FFmpegPCMAudio
 import io
 
-from elevenlabs import voices, generate
-from elevenlabs import set_api_key
-from elevenlabs.api import VoiceSettings
 from discord import FFmpegPCMAudio
-import io
+from elevenlabs import generate, set_api_key, voices
+from elevenlabs.api import VoiceSettings
 
 
 async def get_elevenlabs_audio(bot, message: str):

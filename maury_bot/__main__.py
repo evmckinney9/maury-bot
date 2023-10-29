@@ -2,21 +2,18 @@ import json
 import logging
 import os
 import sys
+
 import discord
+
 from maury_bot.maury import MauryBot
 
-
-if not os.path.isfile(
-    f"{os.path.realpath(os.path.dirname(__file__))}/../config.json"
-):
+if not os.path.isfile(f"{os.path.realpath(os.path.dirname(__file__))}/../config.json"):
     sys.exit("'config.json' not found! Please add it and try again.")
 else:
-    with open(
-        f"{os.path.realpath(os.path.dirname(__file__))}/../config.json"
-    ) as file:
+    with open(f"{os.path.realpath(os.path.dirname(__file__))}/../config.json") as file:
         config = json.load(file)
 
-"""	
+"""
 Setup bot intents (events restrictions)
 For more information about intents, please go to the following websites:
 https://discordpy.readthedocs.io/en/latest/intents.html
@@ -92,9 +89,7 @@ logger.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(LoggingFormatter())
 # File handler
-file_handler = logging.FileHandler(
-    filename="discord.log", encoding="utf-8", mode="w"
-)
+file_handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 file_handler_formatter = logging.Formatter(
     "[{asctime}] [{levelname:<8}] {name}: {message}",
     "%Y-%m-%d %H:%M:%S",

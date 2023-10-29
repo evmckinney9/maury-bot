@@ -1,11 +1,12 @@
-import openai
 import json
 import re
 
+import openai
+
 
 async def get_chatgpt_response(bot, message_list) -> str:
-    """
-    Determine the best model (GPT-3.5-turbo, GPT-4, or DALLE) to handle a given message and generate a response.
+    """Determine the best model (GPT-3.5-turbo, GPT-4, or DALLE) to handle a
+    given message and generate a response.
 
     Args:
         bot: An instance of the bot.
@@ -66,14 +67,10 @@ async def get_chatgpt_response(bot, message_list) -> str:
             function_name = response_message["function_call"]["name"]
             assert function_name == "assistant_response"
 
-            function_args = json.loads(
-                response_message["function_call"]["arguments"]
-            )
+            function_args = json.loads(response_message["function_call"]["arguments"])
 
             # Log the model version selected by the assistant
-            bot.logger.info(
-                f"Chosen model/version: {function_args['model_version']}"
-            )
+            bot.logger.info(f"Chosen model/version: {function_args['model_version']}")
 
             function_result = await assistant_response(
                 bot=bot,
@@ -89,8 +86,8 @@ async def get_chatgpt_response(bot, message_list) -> str:
 
 
 async def assistant_response(bot, model_version, messages):
-    """
-    Generate a response (textual or image) based on the selected model version.
+    """Generate a response (textual or image) based on the selected model
+    version.
 
     Args:
         bot: An instance of the bot.

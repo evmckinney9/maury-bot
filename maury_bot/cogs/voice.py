@@ -1,9 +1,11 @@
+import asyncio
+from collections import deque
+
 from discord.ext import commands
 from discord.ext.commands import Context
-from collections import deque
-import asyncio
-from maury_bot.services.elevenlabs import get_elevenlabs_audio
+
 from maury_bot.services.chatgpt import get_chatgpt_response
+from maury_bot.services.elevenlabs import get_elevenlabs_audio
 
 
 class Voice(commands.Cog, name="voice"):
@@ -15,9 +17,7 @@ class Voice(commands.Cog, name="voice"):
     async def play_audio(self, ctx, audio_source) -> None:
         """Joins voice channel, plays audio, and then leaves."""
         if not ctx.author.voice:
-            await ctx.send(
-                "You must be in a voice channel to use this command."
-            )
+            await ctx.send("You must be in a voice channel to use this command.")
             return
 
         voice_client = await ctx.author.voice.channel.connect()
@@ -63,9 +63,7 @@ class Voice(commands.Cog, name="voice"):
         )
         self.bot.logger.debug(f"Response from model: {message}")
 
-        audio_task = asyncio.create_task(
-            get_elevenlabs_audio(self.bot, message)
-        )
+        audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
         await self.add_to_queue_or_speak(ctx, audio_task)
         await ctx.send(message)
 
@@ -76,9 +74,7 @@ class Voice(commands.Cog, name="voice"):
     async def recite(self, ctx: Context, *, message: str) -> None:
         await ctx.defer(ephemeral=False)
 
-        audio_task = asyncio.create_task(
-            get_elevenlabs_audio(self.bot, message)
-        )
+        audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
         await self.add_to_queue_or_speak(ctx, audio_task)
         await ctx.send(message)
 

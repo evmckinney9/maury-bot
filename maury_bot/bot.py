@@ -9,6 +9,7 @@ Version: 6.1.0
 import os
 import platform
 import random
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
@@ -21,8 +22,8 @@ class DiscordBot(commands.Bot):
             intents=intents,
             help_command=None,
         )
-        """
-        This creates custom bot variables so that we can access these variables in cogs more easily.
+        """This creates custom bot variables so that we can access these
+        variables in cogs more easily.
 
         For example, The config is available using the following code:
         - self.config # In this class
@@ -44,12 +45,9 @@ class DiscordBot(commands.Bot):
     #         await db.commit()
 
     async def load_cogs(self) -> None:
-        """
-        The code in this function is executed whenever the bot will start.
-        """
-        for file in os.listdir(
-            f"{os.path.realpath(os.path.dirname(__file__))}/cogs"
-        ):
+        """The code in this function is executed whenever the bot will
+        start."""
+        for file in os.listdir(f"{os.path.realpath(os.path.dirname(__file__))}/cogs"):
             if file.endswith(".py") and not file.startswith("_"):
                 extension = file[:-3]
                 try:
@@ -63,25 +61,18 @@ class DiscordBot(commands.Bot):
 
     @tasks.loop(minutes=1.0)
     async def status_task(self) -> None:
-        """
-        Setup the game status task of the bot.
-        """
+        """Setup the game status task of the bot."""
         statuses = ["with you!", "with Krypton!", "with humans!"]
-        await self.change_presence(
-            activity=discord.Game(random.choice(statuses))
-        )
+        await self.change_presence(activity=discord.Game(random.choice(statuses)))
 
     @status_task.before_loop
     async def before_status_task(self) -> None:
-        """
-        Before starting the status changing task, we make sure the bot is ready
-        """
+        """Before starting the status changing task, we make sure the bot is
+        ready."""
         await self.wait_until_ready()
 
     async def setup_hook(self) -> None:
-        """
-        This will just be executed when the bot starts the first time.
-        """
+        """This will just be executed when the bot starts the first time."""
         self.logger.info(f"Logged in as {self.user.name}")
         self.logger.info(f"discord.py API version: {discord.__version__}")
         self.logger.info(f"Python version: {platform.python_version()}")
@@ -94,8 +85,8 @@ class DiscordBot(commands.Bot):
         self.status_task.start()
 
     async def on_message(self, message: discord.Message) -> None:
-        """
-        The code in this event is executed every time someone sends a message, with or without the prefix
+        """The code in this event is executed every time someone sends a
+        message, with or without the prefix.
 
         :param message: The message that was sent.
         """
@@ -104,10 +95,11 @@ class DiscordBot(commands.Bot):
         await self.process_commands(message)
 
     async def on_command_completion(self, context: Context) -> None:
-        """
-        The code in this event is executed every time a normal command has been *successfully* executed.
+        """The code in this event is executed every time a normal command has
+        been *successfully* executed.
 
-        :param context: The context of the command that has been executed.
+        :param context: The context of the command that has been
+            executed.
         """
         full_command_name = context.command.qualified_name
         split = full_command_name.split(" ")
@@ -122,10 +114,11 @@ class DiscordBot(commands.Bot):
             )
 
     async def on_command_error(self, context: Context, error) -> None:
-        """
-        The code in this event is executed every time a normal valid command catches an error.
+        """The code in this event is executed every time a normal valid command
+        catches an error.
 
-        :param context: The context of the normal command that failed executing.
+        :param context: The context of the normal command that failed
+            executing.
         :param error: The error that has been faced.
         """
         if isinstance(error, commands.CommandOnCooldown):

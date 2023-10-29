@@ -21,29 +21,23 @@ class Owner(commands.Cog, name="owner"):
         description="Check if the bot is alive.",
     )
     async def ping(self, context: Context) -> None:
-        """
-        Check if the bot is alive.
+        """Check if the bot is alive.
 
         :param context: The hybrid command context.
         """
         context.bot.tree.copy_global_to(guild=context.guild)
         await context.bot.tree.sync(guild=context.guild)
-        embed = discord.Embed(
-            title="Hey kid,", description="scram!", color=0x9C84EF
-        )
+        embed = discord.Embed(title="Hey kid,", description="scram!", color=0x9C84EF)
         await context.send(embed=embed)
 
     @commands.command(
         name="sync",
         description="Synchonizes the slash commands.",
     )
-    @app_commands.describe(
-        scope="The scope of the sync. Can be `global` or `guild`"
-    )
+    @app_commands.describe(scope="The scope of the sync. Can be `global` or `guild`")
     @commands.is_owner()
     async def sync(self, context: Context, scope: str) -> None:
-        """
-        Synchonizes the slash commands.
+        """Synchonizes the slash commands.
 
         :param context: The command context.
         :param scope: The scope of the sync. Can be `global` or `guild`.
@@ -81,8 +75,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @commands.is_owner()
     async def unsync(self, context: Context, scope: str) -> None:
-        """
-        Unsynchonizes the slash commands.
+        """Unsynchonizes the slash commands.
 
         :param context: The command context.
         :param scope: The scope of the sync. Can be `global`, `current_guild` or `guild`.
@@ -119,8 +112,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to load")
     @commands.is_owner()
     async def load(self, context: Context, cog: str) -> None:
-        """
-        The bot will load the given cog.
+        """The bot will load the given cog.
 
         :param context: The hybrid command context.
         :param cog: The name of the cog to load.
@@ -145,8 +137,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to unload")
     @commands.is_owner()
     async def unload(self, context: Context, cog: str) -> None:
-        """
-        The bot will unload the given cog.
+        """The bot will unload the given cog.
 
         :param context: The hybrid command context.
         :param cog: The name of the cog to unload.
@@ -173,8 +164,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to reload")
     @commands.is_owner()
     async def reload(self, context: Context, cog: str) -> None:
-        """
-        The bot will reload the given cog.
+        """The bot will reload the given cog.
 
         :param context: The hybrid command context.
         :param cog: The name of the cog to reload.
@@ -200,14 +190,11 @@ class Owner(commands.Cog, name="owner"):
     )
     @commands.is_owner()
     async def shutdown(self, context: Context) -> None:
-        """
-        Shuts down the bot.
+        """Shuts down the bot.
 
         :param context: The hybrid command context.
         """
-        embed = discord.Embed(
-            description="Shutting down. Bye! :wave:", color=0xBEBEFE
-        )
+        embed = discord.Embed(description="Shutting down. Bye! :wave:", color=0xBEBEFE)
         await context.send(embed=embed)
         await self.bot.close()
 
@@ -215,13 +202,10 @@ class Owner(commands.Cog, name="owner"):
         name="say",
         description="The bot will say anything you want.",
     )
-    @app_commands.describe(
-        message="The message that should be repeated by the bot"
-    )
+    @app_commands.describe(message="The message that should be repeated by the bot")
     @commands.is_owner()
     async def say(self, context: Context, *, message: str) -> None:
-        """
-        The bot will say anything you want.
+        """The bot will say anything you want.
 
         :param context: The hybrid command context.
         :param message: The message that should be repeated by the bot.
@@ -232,13 +216,10 @@ class Owner(commands.Cog, name="owner"):
         name="embed",
         description="The bot will say anything you want, but within embeds.",
     )
-    @app_commands.describe(
-        message="The message that should be repeated by the bot"
-    )
+    @app_commands.describe(message="The message that should be repeated by the bot")
     @commands.is_owner()
     async def embed(self, context: Context, *, message: str) -> None:
-        """
-        The bot will say anything you want, but using embeds.
+        """The bot will say anything you want, but using embeds.
 
         :param context: The hybrid command context.
         :param message: The message that should be repeated by the bot.
@@ -252,8 +233,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @commands.is_owner()
     async def blacklist(self, context: Context) -> None:
-        """
-        Lets you add or remove a user from not being able to use the bot.
+        """Lets you add or remove a user from not being able to use the bot.
 
         :param context: The hybrid command context.
         """
@@ -271,8 +251,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @commands.is_owner()
     async def blacklist_show(self, context: Context) -> None:
-        """
-        Shows the list of all blacklisted users.
+        """Shows the list of all blacklisted users.
 
         :param context: The hybrid command context.
         """
@@ -288,12 +267,10 @@ class Owner(commands.Cog, name="owner"):
         embed = discord.Embed(title="Blacklisted Users", color=0xBEBEFE)
         users = []
         for bluser in blacklisted_users:
-            user = self.bot.get_user(
+            user = self.bot.get_user(int(bluser[0])) or await self.bot.fetch_user(
                 int(bluser[0])
-            ) or await self.bot.fetch_user(int(bluser[0]))
-            users.append(
-                f"• {user.mention} ({user}) - Blacklisted <t:{bluser[1]}>"
             )
+            users.append(f"• {user.mention} ({user}) - Blacklisted <t:{bluser[1]}>")
         embed.description = "\n".join(users)
         await context.send(embed=embed)
 
@@ -302,15 +279,10 @@ class Owner(commands.Cog, name="owner"):
         name="add",
         description="Lets you add a user from not being able to use the bot.",
     )
-    @app_commands.describe(
-        user="The user that should be added to the blacklist"
-    )
+    @app_commands.describe(user="The user that should be added to the blacklist")
     @commands.is_owner()
-    async def blacklist_add(
-        self, context: Context, user: discord.User
-    ) -> None:
-        """
-        Lets you add a user from not being able to use the bot.
+    async def blacklist_add(self, context: Context, user: discord.User) -> None:
+        """Lets you add a user from not being able to use the bot.
 
         :param context: The hybrid command context.
         :param user: The user that should be added to the blacklist.
@@ -338,15 +310,10 @@ class Owner(commands.Cog, name="owner"):
         name="remove",
         description="Lets you remove a user from not being able to use the bot.",
     )
-    @app_commands.describe(
-        user="The user that should be removed from the blacklist."
-    )
+    @app_commands.describe(user="The user that should be removed from the blacklist.")
     @commands.is_owner()
-    async def blacklist_remove(
-        self, context: Context, user: discord.User
-    ) -> None:
-        """
-        Lets you remove a user from not being able to use the bot.
+    async def blacklist_remove(self, context: Context, user: discord.User) -> None:
+        """Lets you remove a user from not being able to use the bot.
 
         :param context: The hybrid command context.
         :param user: The user that should be removed from the blacklist.

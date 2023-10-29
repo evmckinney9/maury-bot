@@ -1,13 +1,16 @@
 """Subclass of DiscordBot."""
 
-from maury_bot.bot import DiscordBot
 from random import choice, randint
-from discord.ext import tasks
+
 import discord
+from discord.ext import tasks
+
+from maury_bot.bot import DiscordBot
 
 
 class MauryBot(DiscordBot):
-    """Subclass of DiscordBot designed to emulate Captain Maury, a seafaring ghost captain."""
+    """Subclass of DiscordBot designed to emulate Captain Maury, a seafaring
+    ghost captain."""
 
     NAME = "Captain Maury"
     DESCRIPTION = (
@@ -70,9 +73,7 @@ class MauryBot(DiscordBot):
 
     def get_dalle_prompt(self) -> str:
         """Return a prompt with personality for DALLE model."""
-        return (
-            f"{self._dalle_prompt()} {self._get_personality(dalle_mode=True)}"
-        )
+        return f"{self._dalle_prompt()} {self._get_personality(dalle_mode=True)}"
 
     def _base_prompt(self) -> str:
         """Return the basic instructional prompt for the bot."""
@@ -110,9 +111,7 @@ class MauryBot(DiscordBot):
 
     @tasks.loop(hours=8)
     async def status_task(self) -> None:
-        """
-        Setup the game status task of the bot
-        """
+        """Setup the game status task of the bot."""
         if randint(0, 100) == 0:
             await self.change_presence(
                 activity=discord.Activity(
@@ -127,7 +126,6 @@ class MauryBot(DiscordBot):
 
     @status_task.before_loop
     async def before_status_task(self) -> None:
-        """
-        Before starting the status changing task, we make sure the bot is ready
-        """
+        """Before starting the status changing task, we make sure the bot is
+        ready."""
         await self.wait_until_ready()
