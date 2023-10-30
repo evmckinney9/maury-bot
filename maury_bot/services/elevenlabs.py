@@ -4,15 +4,28 @@ from discord import FFmpegPCMAudio
 from elevenlabs import generate, set_api_key, voices
 from elevenlabs.api import VoiceSettings
 
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+# Define the retry parameters
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=30), reraise=True)
+def robust_voices():
+    return voices()
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=30), reraise=True)
+def robust_generate(text, voice, model, stream):
+    return generate(text=text, voice=voice, model=model, stream=stream)
+
+class ElevenLabsAPIError(Exception):
+    """Custom exception for ElevenLabs API errors."""
+    pass
 
 async def get_elevenlabs_audio(bot, message: str):
     bot.logger.info("Generating audio stream...")
-
     try:
         set_api_key(bot.config["elevenlabs_api_key"])
 
         # get voice ID, or a random voice if none (or on failure)
-        voice_list = voices()
+        voice_list = robust_voices()
         voice = next((v for v in voice_list if v.name == bot.NAME), None)
         if not voice:
             voice = voice_list[0]
@@ -24,10 +37,9 @@ async def get_elevenlabs_audio(bot, message: str):
             style=0.5,
             use_speaker_boost=False,
         )
-        audio_stream = generate(
+        audio_stream = robust_generate(
             text=message,
             voice=voice,
-            # model="eleven_multilingual_v2",
             model="eleven_monolingual_v1",
             stream=True,
         )
@@ -42,9 +54,7 @@ async def get_elevenlabs_audio(bot, message: str):
         )
 
         return audio_source
-
+    
     except Exception as e:
-        bot.logger.error(f"Error generating audio from ElevenLabs: {e}")
-        # Handle the error in an appropriate way for your bot, such as sending an error message to the user.
-        # Here, I'm raising the error again to let the calling function handle it. Adjust as necessary.
-        raise
+        # Raise a custom exception.
+        raise ElevenLabsAPIError from e

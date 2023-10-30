@@ -9,6 +9,7 @@ version = "0.2.0"
 authors = [{ name = "Evan McKinney" }]
 requires-python = ">=3.9"
 dependencies = [
+    "tenacity",
     "aiohttp",
     "aiosqlite",
     "discord.py[voice]",

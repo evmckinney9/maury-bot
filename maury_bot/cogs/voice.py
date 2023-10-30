@@ -5,8 +5,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 
 from maury_bot.services.chatgpt import get_chatgpt_response
-from maury_bot.services.elevenlabs import get_elevenlabs_audio
-
+from maury_bot.services.elevenlabs import get_elevenlabs_audio, ElevenLabsAPIError
 
 class Voice(commands.Cog, name="voice"):
     def __init__(self, bot) -> None:
@@ -56,28 +55,35 @@ class Voice(commands.Cog, name="voice"):
         description="Bot joins voice call and speaks the model response.",
     )
     async def speak(self, ctx: Context, *, message: str) -> None:
-        await ctx.defer(ephemeral=False)
+        try:
+            await ctx.defer(ephemeral=False)
 
-        message = await get_chatgpt_response(
-            self.bot, [{"role": "user", "content": message}]
-        )
-        self.bot.logger.debug(f"Response from model: {message}")
+            message = await get_chatgpt_response(
+                self.bot, [{"role": "user", "content": message}]
+            )
+            self.bot.logger.debug(f"Response from model: {message}")
 
-        audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
-        await self.add_to_queue_or_speak(ctx, audio_task)
-        await ctx.send(message)
+            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
+            await self.add_to_queue_or_speak(ctx, audio_task)
+            await ctx.send(message)
+        except ElevenLabsAPIError as e:
+            self.bot.logger.error(f"Error in speak command: {e}")
+            await ctx.send("Sorry, there was an error processing your request.")
 
     @commands.hybrid_command(
         name="recite",
         description="Bot joins voice call and recites provided text.",
     )
     async def recite(self, ctx: Context, *, message: str) -> None:
-        await ctx.defer(ephemeral=False)
+        try:
+            await ctx.defer(ephemeral=False)
 
-        audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
-        await self.add_to_queue_or_speak(ctx, audio_task)
-        await ctx.send(message)
-
+            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
+            await self.add_to_queue_or_speak(ctx, audio_task)
+            await ctx.send(message)
+        except ElevenLabsAPIError as e:
+            self.bot.logger.error(f"Error in recite command: {e}")
+            await ctx.send("Sorry, there was an error processing your request.")
 
 async def setup(bot) -> None:
     """Adds the Voice cog to the bot."""

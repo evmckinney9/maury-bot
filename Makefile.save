@@ -7,7 +7,8 @@ PRE_COMMIT = .venv/bin/pre-commit
 init:
 	rm -rf .venv
 	$(PYTHON_VERSION) -m venv .venv
-	@$(PIP) install --upgrade pip
+	@$(PIP) install --u
+pgrade pip
 	$(PIP) install -e .
 
 upgrade:
