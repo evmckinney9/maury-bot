@@ -61,6 +61,9 @@ class Voice(commands.Cog, name="voice"):
             message = await get_chatgpt_response(
                 self.bot, [{"role": "user", "content": message}]
             )
+
+            # replace newline characters with <break time="0.5s"/>
+            message = message.replace("\n", '<break time="0.5s"/>')
             self.bot.logger.debug(f"Response from model: {message}")
 
             audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
