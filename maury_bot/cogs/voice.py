@@ -63,7 +63,7 @@ class Voice(commands.Cog, name="voice"):
             )
 
             # replace newline characters with <break time="0.5s"/>
-            message = message.replace("\n", '<break time="0.5s"/>')
+            message = message.replace("\n\n", '<break time="0.5s"/>')
             self.bot.logger.debug(f"Response from model: {message}")
 
             audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
