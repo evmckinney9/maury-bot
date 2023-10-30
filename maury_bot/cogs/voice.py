@@ -63,10 +63,10 @@ class Voice(commands.Cog, name="voice"):
             )
 
             # replace newline characters with <break time="0.5s"/>
-            message = message.replace("\n\n", '<break time="0.5s"/>')
+            voice_message = message.replace("\n\n", '<break time="0.75s"/>')
             self.bot.logger.debug(f"Response from model: {message}")
 
-            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
+            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, voice_message))
             await self.add_to_queue_or_speak(ctx, audio_task)
             await ctx.send(message)
         except ElevenLabsAPIError as e:
