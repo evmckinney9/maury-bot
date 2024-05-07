@@ -19,7 +19,7 @@ async def get_reddit_comments(thread_url, N=25):
     comments_json = [
         {
             "role": "user",
-            "content": f"@{comment.author.name}: {comment.body}"
+            "content": f"{comment.body}"
         } for comment in top_level_comments if comment.author is not None
     ]
     await reddit_instance.close()
