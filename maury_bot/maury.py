@@ -75,6 +75,10 @@ class MauryBot(DiscordBot):
         """Return a prompt with personality for DALLE model."""
         return f"{self._dalle_prompt()} {self._get_personality(dalle_mode=True)}"
 
+    def get_reddit_prompt(self) -> str:
+        """Return a prompt with personality for summarizing a reddit thread."""
+        return f"{self._reddit_prompt()} {self._get_personality()}"
+
     def _base_prompt(self) -> str:
         """Return the basic instructional prompt for the bot."""
         prompt = (
@@ -94,6 +98,18 @@ class MauryBot(DiscordBot):
             "Carefully address the specific query provided in the conversation. "
             "Produce a rich and vivid visual description relevant to the question, "
             "ensuring it can be easily translated into an image. Be concise, clear, and accurate."
+        )
+        return prompt
+    
+    def _reddit_prompt(self) -> str:
+        """Generate an instructional prompt for processing a stream of comments from a live wrestling event, guiding the response to be in the style of a smarky fan watching the event live."""
+        prompt = (
+            "This task involves dynamically engaging with a stream of comments from a live wrestling event. "
+            "The comments reflect the perspectives of passionate and discerning wrestling fans, often called 'smarks'. "
+            "You are expected to respond with short, lively remarks that relate directly to the ongoing broadcast as if you are watching it live. "
+            "Your responses should mimic the style of a smarky fan—combining enthusiasm, critical insights, and a deep understanding of wrestling. "
+            "Focus on making remarks that contribute to the excitement and depth of the fan discussion, without explicitly acknowledging the source of the comments. "
+            "The goal is to enhance the viewer experience by adding your own flavor of commentary, as if you're part of the live audience reacting in real-time."
         )
         return prompt
 

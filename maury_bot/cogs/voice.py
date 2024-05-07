@@ -1,34 +1,58 @@
 import asyncio
+import time
 from collections import deque
 
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from maury_bot.services.chatgpt import get_chatgpt_response
-from maury_bot.services.elevenlabs import get_elevenlabs_audio, ElevenLabsAPIError
+from maury_bot.services.chatgpt import get_chatgpt_reddit_message, get_chatgpt_response
+from maury_bot.services.elevenlabs import ElevenLabsAPIError, get_elevenlabs_audio
+from maury_bot.services.reddit import get_reddit_comments
+
 
 class Voice(commands.Cog, name="voice"):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.queue = deque()
         self.lock = asyncio.Lock()
+        self.last_voice_command_time = None
+        self.cooldown_period = 180  # 3 minutes in seconds
+        self.disconnect_task = None
 
     async def play_audio(self, ctx, audio_source) -> None:
-        """Joins voice channel, plays audio, and then leaves."""
+        """Joins voice channel, plays audio, and then starts a disconnect cooldown."""
         if not ctx.author.voice:
             await ctx.send("You must be in a voice channel to use this command.")
             return
 
-        voice_client = await ctx.author.voice.channel.connect()
+        # Check if the bot is already connected to the voice channel
+        voice_client = ctx.guild.voice_client
+        if not voice_client:
+            voice_client = await ctx.author.voice.channel.connect()
+
         voice_client.play(audio_source)
 
         while voice_client.is_playing():
             await asyncio.sleep(1)
 
-        await voice_client.disconnect()
+        if self.disconnect_task is None:
+            self.disconnect_task = asyncio.create_task(self.wait_and_disconnect(ctx))
+
+    async def wait_and_disconnect(self, ctx):
+        """Wait for the cooldown period and then disconnect if no new commands were received."""
+        await asyncio.sleep(self.cooldown_period)
+
+        # Check if cooldown has expired
+        if time.time() - self.last_voice_command_time > self.cooldown_period:
+            voice_client = ctx.guild.voice_client
+            if voice_client and not voice_client.is_playing():
+                await voice_client.disconnect()
+            self.disconnect_task = None
 
     async def handle_speak(self, ctx, audio_task):
         """Processes and plays the requested speech."""
+        self.last_voice_command_time = time.time()  # Refresh the last command time
+
         async with self.lock:
             audio_source = await audio_task
             await self.play_audio(ctx, audio_source)
@@ -66,11 +90,13 @@ class Voice(commands.Cog, name="voice"):
             voice_message = message.replace("\n\n", '<break time="0.75s"/>')
             self.bot.logger.debug(f"Response from model: {message}")
 
-            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, voice_message))
+            audio_task = asyncio.create_task(
+                get_elevenlabs_audio(self.bot, voice_message)
+            )
             await self.add_to_queue_or_speak(ctx, audio_task)
             await ctx.send(message)
         except ElevenLabsAPIError as e:
-            self.bot.logger.error(f"Error in speak command: {e}")
+            self.bot.logger.error(f"Error in speak command: {repr(e)}")
             await ctx.send("Sorry, there was an error processing your request.")
 
     @commands.hybrid_command(
@@ -85,8 +111,38 @@ class Voice(commands.Cog, name="voice"):
             await self.add_to_queue_or_speak(ctx, audio_task)
             await ctx.send(message)
         except ElevenLabsAPIError as e:
-            self.bot.logger.error(f"Error in recite command: {e}")
+            self.bot.logger.error(f"Error in recite command: {repr(e)}")
             await ctx.send("Sorry, there was an error processing your request.")
+
+    @commands.hybrid_command(
+            name="smark",
+            description="Bot joins voice call and speaks the model response from a Reddit thread.",
+        )
+    async def smark(self, ctx: Context, thread_url: str) -> None:
+        try:
+            await ctx.defer(ephemeral=False)
+
+            # Fetch comments from the Reddit thread
+            comments = await get_reddit_comments(thread_url)
+
+            # Generate response using ChatGPT
+            message = await get_chatgpt_reddit_message(self.bot, comments)
+
+            # Synthesize audio from the response
+            audio_task = asyncio.create_task(
+                get_elevenlabs_audio(self.bot, message)
+            )
+
+            # Speak the synthesized audio in the voice channel
+            await self.add_to_queue_or_speak(ctx, audio_task)
+
+            # Send the original message as a text response
+            await ctx.send(message)
+        except Exception as e:
+            self.bot.logger.error(f"Error in reddit command: {repr(e)}")
+            await ctx.send("Sorry, there was an error processing your request.")
+
+
 
 async def setup(bot) -> None:
     """Adds the Voice cog to the bot."""

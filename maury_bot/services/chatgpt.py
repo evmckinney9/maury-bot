@@ -3,6 +3,23 @@ import re
 
 import openai
 
+# from openai import OpenAI
+
+# client = OpenAI(
+#   organization='org-UUdF8oWozAPMP6dZUFO69gWo',
+#   project='proj_YUM41XaGV98ej14bFT97grpS',
+# )
+
+# # # using new beta assistant API
+# # async foo(bot, message_list) -> str:
+# #     client = openai.OpenAI()
+# #     assistant = client.beta.assistants.
+
+async def get_chatgpt_reddit_message(bot, message_list) -> str:
+    bot.logger.info("Generating chat response...")
+    openai.api_key = bot.config["openai_api_key"]
+    # Call assistant_response with the model_version set to "gpt-3.5-turbo"
+    return await assistant_response(bot, "gpt-3.5-turbo", message_list, prompt_type="reddit")
 
 async def get_chatgpt_response(bot, message_list) -> str:
     """Determine the best model (GPT-3.5-turbo, GPT-4, or DALLE) to handle a
@@ -85,7 +102,7 @@ async def get_chatgpt_response(bot, message_list) -> str:
         return "Apologies, an error occurred."
 
 
-async def assistant_response(bot, model_version, messages):
+async def assistant_response(bot, model_version, messages, prompt_type="basic"):
     """Generate a response (textual or image) based on the selected model
     version.
 
@@ -100,7 +117,11 @@ async def assistant_response(bot, model_version, messages):
 
     if model_version in ["gpt-3.5-turbo", "gpt-4"]:
         # Insert the basic prompt to the message list
-        basic_prompt = bot.get_basic_prompt()
+        if prompt_type == "basic":
+            basic_prompt = bot.get_basic_prompt()
+        else:
+            basic_prompt = bot.get_reddit_prompt()
+            
         messages.insert(0, {"role": "system", "content": basic_prompt})
 
         response = await openai.ChatCompletion.acreate(
