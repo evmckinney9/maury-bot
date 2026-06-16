@@ -6,8 +6,8 @@ from discord.ext import commands
 from discord.ext.commands import Context
 
 from maury_bot.services.chatgpt import get_chatgpt_reddit_message, get_chatgpt_response
-from maury_bot.services.elevenlabs import ElevenLabsAPIError, get_elevenlabs_audio
 from maury_bot.services.reddit import get_reddit_comments
+from maury_bot.services.tts import TTSError, get_tts_audio
 
 
 class Voice(commands.Cog, name="voice"):
@@ -91,11 +91,11 @@ class Voice(commands.Cog, name="voice"):
             self.bot.logger.debug(f"Response from model: {message}")
 
             audio_task = asyncio.create_task(
-                get_elevenlabs_audio(self.bot, voice_message)
+                get_tts_audio(self.bot, voice_message)
             )
             await self.add_to_queue_or_speak(ctx, audio_task)
             await ctx.send(message)
-        except ElevenLabsAPIError as e:
+        except TTSError as e:
             self.bot.logger.error(f"Error in speak command: {repr(e)}")
             await ctx.send("Sorry, there was an error processing your request.")
 
@@ -107,10 +107,10 @@ class Voice(commands.Cog, name="voice"):
         try:
             await ctx.defer(ephemeral=False)
 
-            audio_task = asyncio.create_task(get_elevenlabs_audio(self.bot, message))
+            audio_task = asyncio.create_task(get_tts_audio(self.bot, message))
             await self.add_to_queue_or_speak(ctx, audio_task)
             await ctx.send(message)
-        except ElevenLabsAPIError as e:
+        except TTSError as e:
             self.bot.logger.error(f"Error in recite command: {repr(e)}")
             await ctx.send("Sorry, there was an error processing your request.")
 
@@ -130,7 +130,7 @@ class Voice(commands.Cog, name="voice"):
 
             # Synthesize audio from the response
             audio_task = asyncio.create_task(
-                get_elevenlabs_audio(self.bot, message)
+                get_tts_audio(self.bot, message)
             )
 
             # Speak the synthesized audio in the voice channel
